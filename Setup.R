@@ -50,5 +50,5 @@ if (!dir.exists(paths = 'StackMat-master')) {
 }
 
 
-
+rm(list=ls())
 
