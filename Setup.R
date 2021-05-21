@@ -21,10 +21,17 @@ rm(list = ls())
 
 # Download data and scripts # =========================================================================
 
-utils::download.file(url = "https://github.com/giucarny/StackMat/archive/refs/heads/master.zip"
-                     , destfile = "StackMat-master.zip")
 
-utils::unzip(zipfile = 'StackMat-master.zip')
+if (!dir.exists(paths = 'StackMat-master')) {
+  utils::download.file(url = "https://github.com/giucarny/StackMat/archive/refs/heads/master.zip"
+                       , destfile = "StackMat-master.zip")
+  utils::unzip(zipfile = 'StackMat-master.zip')
+  file.remove('StackMat-master.zip')
+  
+} else {
+  fls <- c('')
+}
+
 
 
 
