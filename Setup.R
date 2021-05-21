@@ -1,5 +1,5 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Title: Script for Stacking Data (EES 2019 Voter Study, Italian Sample) 
+# Title: Setup Script for Stacking Data 
 # Author: G.Carteny
 # last update: 2021-05-21
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -19,15 +19,12 @@ options(scipen = 99)
 rm(list = ls())
 
 
-# Download the data # =================================================================================
+# Download data and scripts # =========================================================================
 
-if (!file.exists('ZA7581_v1-0-0.dta')) {
-  
-}
+utils::download.file(url = "https://github.com/giucarny/StackMat/archive/refs/heads/master.zip"
+                     , destfile = "StackMat-master.zip")
 
-utils::download.file(
-  url= 'https://drive.google.com/file/d/1yNrZOWV2HiKtiBYfMd9PP7jHNTeu_bq1/view?usp=sharing',
-  destfile = 'ZA7581_v1-0-0.dta'
-)
+utils::unzip(zipfile = 'StackMat-master.zip')
 
-haven::read_dta('ZA7581_v1-0-0.dta')
+
+
