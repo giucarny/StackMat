@@ -316,4 +316,158 @@ EES2019_it_stckd %<>% dplyr::select(-c(lr_self, party_lr))
 rm(df, prties_lr_df)
 
 
+# Sociodemographic Synthetic Vars # ===================================================================
+
+# This block explains how to create a 'synthetic' variable. To compute such kind of variables we need
+# to estimate a set of logistic regressions. 
+
+# Thus, the first part of this block is dedicated to create the dataframes for the regression models,
+# the second part is dedicated to estimate the logistic regression models, predict the individual
+# scores, and finally the third part is dedicated to binding such scores to the stacked data matrix.
+
+
+# 1. Create the data frame for the regression models # - - - - - - - - - - - - - - - - - - - - - - - -
+
+# First, we keep from the original EES dataset the respondents id variable, a set of socio-demographic
+# variables (e.g. age and gender) and the original descrete vote_choice variable.
+
+df <- 
+  EES2019_it %>%
+  dplyr::mutate(gender = D3, vote_ch = Q7) %>%
+  dplyr::select(respid, gender, age, vote_ch) 
+
+df %<>% zap_labels() # We drop all the variables' labels
+
+# We create a vector containing the set of relevant parties already available in the stacked dataframe
+
+rel_parties <- EES2019_it_stckd$party %>% unique() 
+
+# Then we recode the discrete vote choice variable assignin missing values to all the vote-choices that 
+# do not refer to the relevant parties. Moreover, we transform the 'gender' variable in a factor.
+
+df %<>% 
+  mutate(vote_ch = case_when(!(vote_ch %in% rel_parties) ~ NA_real_,
+                            T~vote_ch),
+         gender = as.factor(gender))
+
+# Then we specify a function that (1) creates a column for a party, and (2) assigns the value 1 when 
+# the vote choice of the respondent corresponds to the party about which the column refers, or assigns
+# the value 0 in all the other cases. The functions argument are thus (a) the dataframe to be used and
+# (b) the list of parties to be considered. 
+
+depvar.fun <- function(data, prty) {
+  x <- mutate(data, "vote_ch_{prty}" := case_when(vote_ch==prty ~ 1, T ~ 0))
+  x %<>% dplyr::select(length(x))
+  return(x)
+}
+
+# Then the function is applied to the whole list of relevant parties, and all the columns are bind 
+# together. 
+
+vote_ch_df <- 
+  lapply(data = df,           # Here the dataframe to be used is specified
+         X=rel_parties,       # Here the list of relevant parties is specified
+         FUN=depvar.fun) %>%  # Here we specify the function to be applied to the parties vector
+  do.call('cbind',.)          # The columns are then bind together
+
+# Then we bind the just created data frame with the dataframe created earlier. 
+
+df <- cbind(df, vote_ch_df) 
+
+
+# 2. Regression models and predictions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# The following wraps up several functions. In a nutshell:
+#   a. A regression model for a specific party choice is created
+#   b. After mutating the data for the regression model, and applying a simple imputation method for 
+#      the missing values of the predictor, the (logistic) regression model is estimated  
+#   c. The function will then estimate the predicted probabilities (yhat) for each respondent 
+#      and will bind these probabilities to the input dataframe
+
+synth.vars.fun <- function(data, depvar, indvar) {
+  
+  frmla <- as.formula(paste(depvar, paste(indvar, collapse = " + "), sep = " ~ "))
+  
+  ics <- data %<>% dplyr::select(all_of(depvar), all_of(indvar))
+  
+  for(i in 2:length(ics)) {
+    vec <- ics[[i]] 
+    
+    cl <- class(ics[[i]])
+    
+    if(cl=='numeric') {
+      ics[[i]] <- ifelse(is.na(vec), mean(vec, na.rm=T) , vec)
+    } else if (cl=='factor') {
+      ics[[i]] <- ifelse(is.na(vec), median(vec, na.rm=T) , vec)
+    }
+  }
+  
+  x <- glm(frmla, data = ics, family = "binomial")
+
+  outcome <- data.frame(respos = predict(x) %>% attr(., 'names') %>% as.numeric(),
+                        yhat = predict(x, type='response'))
+
+  respid <- data.frame(respos = 1:nrow(df),
+                       respid = df$respid)
+
+  outcomedf <- left_join(respid, outcome)
+
+  outcomedf %<>% dplyr::select(respid, yhat)
+
+  names(outcomedf)[names(outcomedf)=='yhat'] <- paste0('yhat_', depvar)
+
+  df <- left_join(df, outcomedf)
+
+  return(df)
+}
+
+# In order to apply the function above we specify the column names containing the dependent variables,
+# namely individuals' vote choice for each relevant party. Finally, using a loop, we apply the function 
+# to each party-choice column.
+
+# Thus, the resulting data frame contains: (1) The respondent id columns; (2) The predictors (in our 
+# case, gender and age); (3) The columns of the original dependent variables ('vote_ch_xxxx'); (4) The 
+# predicted probabilities of the regression model for each respondent/voter
+
+depvars <- names(df)[str_detect(names(df), pattern='vote_ch_')]
+
+for(s in 1:length(depvars)) {
+  df <- synth.vars.fun(data=df, depvar=depvars[[s]], indvar = c("gender", "age"))
+}
+rm(s)
+
+# Finally we remove the ad hoc functions created earlier, and the auxiliary vectors
+
+rm(list=ls(pattern='fun|dep|rel'))
+
+
+# 3. Attach the predicted probabilities to the stacked data matrix # - - - - - - - - - - - - - - - - - 
+
+# First we select the colums referring to each respondent and the predicted probabilities. Then, we 
+# rename the predicted probabilities column, eliminating the 'yhat_votech_' suffix. Consequently, 
+# the new column names will refer to the relevant variables (in our example: 1501, 1502,...)
+
+df %<>% dplyr::select(respid, starts_with('yhat'))
+names(df) %<>% gsub('yhat_vote_ch_','',.)
+
+# Then the matrix is reshaped from wide to long format, with: (1) a column referring to the respondents'
+# id, another one (2) referring to the party id, and finally a column (3) referring to the predicted 
+# probability for each party-voter combination. In other words, we create a new stacked data matrix. 
+
+
+df %<>% 
+  pivot_longer(cols=starts_with('1'), names_to='party', values_to='sociodemo_yhat') %>% 
+  mutate(party = as.numeric(party))
+
+# Then this dataframe is joined w/ the main stacked data matrix, using the respondents id and party columns
+
+EES2019_it_stckd <- left_join(EES2019_it_stckd, df)
+
+rm(df)
+
+
+# Save the stacked data frame # =======================================================================
+
+setwd(paste0(getwd(), '/data/'))
+fwrite(EES2019_it_stckd, file='EES2019_it_stacked.csv')
 
