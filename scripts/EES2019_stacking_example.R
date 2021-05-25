@@ -20,6 +20,9 @@ options(scipen = 99)
 # Remove all the objects from the environment # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rm(list = ls())
 
+# Set the working directory # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+setwd(paste0(getwd(), '/StackMat-master/'))
 
 
 # Load data # =========================================================================================
