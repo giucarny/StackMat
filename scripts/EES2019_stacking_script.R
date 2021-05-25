@@ -11,7 +11,7 @@
 
 # ADMIN #==============================================================================================
 
-want = c("tidyverse", "reshape2", "gridExtra", "magrittr", "haven", "data.table", "labelled")
+want = c("tidyverse", "magrittr", "haven", "labelled")
 
 have = want %in% rownames(installed.packages())
 if ( any(!have) ) { install.packages( want[!have] ) }

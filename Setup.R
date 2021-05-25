@@ -9,7 +9,7 @@
 
 # Install and load the relevant packages # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-want = c("tidyverse", "reshape2", "gridExtra", "magrittr", "haven", "data.table", "labelled", "utils")
+want = c("tidyverse", "magrittr", "haven", "data.table", "labelled")
 
 have = want %in% rownames(installed.packages())
 if ( any(!have) ) { install.packages( want[!have] ) }
