@@ -46,7 +46,7 @@ if (!dir.exists(paths = 'StackMat-master')) {
                              'EES2019_it_stacked.csv'))
     script.dir.fls <- paste0(paste0(getwd(), '/StackMat-master/scripts/'), 
                              c('EES2019_stacking_example.R'))
-    doc.dir.fls <- paste0(paste0(getwd(), '/StackMat-master/scripts/'), 
+    doc.dir.fls <- paste0(paste0(getwd(), '/StackMat-master/documentation/'), 
                              c('rmd_inheader.tex', 
                                'StackMat - Software Setup.Rmd',
                                'StackMat---Software-Setup.pdf'))
