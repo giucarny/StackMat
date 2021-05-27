@@ -196,10 +196,10 @@ rm(df, ptvs_prties)
 
 # EES based left-right # ==============================================================================
 
-# This block creates the first dependent variable of vote-choice or vote-utility (namely, the PTV var).
+# This block creates the first independent variable, namely the party-voter LR distance variable.
 
 # First, we select respondents' left-right self-placement, dropping the value labels and then recoding]
-# the missing values/
+# the missing values
 
 df <- 
   EES2019_it %>% 
@@ -283,14 +283,13 @@ names(df)[names(df)=='V1'] <- 'party_lr_val'
 rownames(df) <- NULL
 
 
-# Now, we join, on the one hand, this data frame and the auxiliary dataframe created earlier 
-# juxtaposing the party LR position variable names and the party identification codes.
-
+# Now, we join, on the one hand, this data frame and, on the other hand, the auxiliary dataframe 
+# created earlier juxtaposing the party LR position variable names and the party identification codes.
 
 df <- 
   dplyr::left_join(df, prties_lr_df) %>%         # Join the dataset by the common variables ('party_lr)
   dplyr::mutate(party_lr = party_lr_val) %>%     # Rename the variable containing the party LR position values
-  dplyr::select(party, party_lr)          # keep only the selected columns
+  dplyr::select(party, party_lr)                 # keep only the selected columns
 
 
 
