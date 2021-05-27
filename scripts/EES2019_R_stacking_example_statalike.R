@@ -293,11 +293,17 @@ for(i in depvars) {
 rm(i, depvars)
 
 
+# Drop the education dummy variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% dplyr::select(-c(edu1, edu2, edu3))
+
+
 # Stack the observations ==============================================================================
 
 EES2019_it_stacked <- genstacks(data = EES2019_it, 
                                 idvar = 'respid', 
-                                stubs = c('q10', 'q13', 'Q7', 'genderage_yhat'),
+                                stubs = c('q10', 'q13', 'q24', 'Q7', 'Q25',
+                                          'age_cont', 'age_dich', 'socdem_dich', 'socdem_cont'),
                                 keepvar = c('gndr', 'age'))
 
 # Mutate the dataset ==================================================================================
@@ -308,8 +314,10 @@ EES2019_it_stacked %<>%
   dplyr::mutate(respid = Var1, 
                 party = Var2, 
                 ptv = q10, 
-                lr_dist = q13,
                 stacked_vc = Q7, 
+                lr_dist = q13,
+                eu_dist = q24,
+                pid = Q25,
                 dyad = paste0(respid, "-", party)) %>%
   dplyr::select(dyad, respid, party, ptv, stacked_vc, lr_dist, genderage_yhat, gndr, age)
 
