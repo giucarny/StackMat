@@ -65,7 +65,7 @@ genyhats <- function(data, depvar, regtype, indvar, newname) {
     
     outcome <- data.frame(respos = predict(x) %>% attr(., 'names') %>% as.numeric(),
                           yhat = predict(x, type='response'))
-  } else {
+  } else if (rlang::is_missing(regtype) | regtype=='linear' | regtype=='OLS') {
     x <- lm(frmla, data = ics)
     
     outcome <- data.frame(respos = predict(x) %>% attr(., 'names') %>% as.numeric(),
