@@ -190,6 +190,11 @@ EES2019_it %<>%
   dplyr::mutate(across(starts_with('q10_'), ~case_when(.>10 ~ NA_real_, 
                                                        T ~ .)))
 
+# Rescale the PTV variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(across(starts_with('q10_'), ~./10))
+
 # Drop the empty PTV variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 EES2019_it %<>% dplyr::select(-c(paste0('q10_', seq(8,10,1))))
@@ -303,7 +308,8 @@ EES2019_it %<>% dplyr::select(-c(edu1, edu2, edu3))
 EES2019_it_stacked <- genstacks(data = EES2019_it, 
                                 idvar = 'respid', 
                                 stubs = c('q10', 'q13', 'q24', 'Q7', 'Q25',
-                                          'age_cont', 'age_dich', 'socdem_dich', 'socdem_cont'),
+                                          'age_cont_yhat', 'age_dich_yhat', 
+                                          'socdem_dich_yhat', 'socdem_cont_yhat'),
                                 keepvar = c('gndr', 'age'))
 
 # Mutate the dataset ==================================================================================
@@ -319,7 +325,7 @@ EES2019_it_stacked %<>%
                 eu_dist = q24,
                 pid = Q25,
                 dyad = paste0(respid, "-", party)) %>%
-  dplyr::select(dyad, respid, party, ptv, stacked_vc, lr_dist, genderage_yhat, gndr, age)
+  dplyr::select(dyad, respid, party, ptv, stacked_vc, lr_dist, ends_with('yhat'), gndr, age)
 
 
 
