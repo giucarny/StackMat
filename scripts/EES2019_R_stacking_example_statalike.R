@@ -49,17 +49,10 @@ rm(EES2019)
 
 # Select the relevant variables # =====================================================================
 
-EES2019_it %<>% dplyr::select(respid, 
-                              Q7, 
-                              starts_with('q10'), 
-                              Q11, 
-                              starts_with('q13'), 
-                              D3, 
-                              D4_1,
-                              Q23,
-                              starts_with('q24'),
-                              Q25,
-                              EDU)
+EES2019_it %<>% dplyr::select(respid, D3, D4_1, EDU, 
+                              Q7, starts_with('q10'), 
+                              Q11, starts_with('q13'),  
+                              Q23, starts_with('q24'), Q25)
 
 
 # Create additional variables # =======================================================================
@@ -71,9 +64,9 @@ EES2019_it %<>%
   dplyr::filter(age>17) %>%
   dplyr::select(-c('D4_1'))
 
-# Rename the gender variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Rename gender and education variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 names(EES2019_it)[names(EES2019_it)=='D3'] <- 'gndr'
-
+names(EES2019_it)[names(EES2019_it)=='EDU'] <- 'edu'
 
 # Select the relevant parties # =======================================================================
 
@@ -123,6 +116,65 @@ EES2019_it %<>%
 names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q13_', seq(1501, 1507, 1))
 
 
+# EU integration distance # ===========================================================================
+
+# Drop variable related to non-relevant parties - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% dplyr::select(-c(q24_8, q24_9))
+
+
+# Recode missing values - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>% 
+  dplyr::mutate(Q23 = case_when(Q23 > 10 ~ NA_real_, 
+                                T ~ Q23))            
+
+EES2019_it %<>% 
+  dplyr::mutate(across(starts_with('q24'), ~case_when(.>10 ~ NA_real_,
+                                                      T ~ .)))
+
+# Generate mean values of party positions on EU integration - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>%
+  mutate(across(starts_with('q24'), list(mean = ~mean(., na.rm=T))))
+
+
+# Generate EU integration distance variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it <- cbind(EES2019_it,
+                    gendist(data = EES2019_it, 
+                            indices = 1:7, 
+                            stub = 'q24'))
+
+
+# Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>%
+  dplyr::select(-c(Q23, 
+                   ends_with('mean'),
+                   paste0('q24_', seq(1,7,1))))
+
+
+# Rename the generated variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q24_', seq(1501, 1507, 1))
+
+
+# Party identification # ==============================================================================
+
+# Recode the party identification variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(Q25 = case_when(Q25 >=1508  ~ NA_real_, 
+                                Q25 < 100 ~ NA_real_,
+                                T ~ Q25))  
+
+EES2019_it <- cbind(EES2019_it, 
+                    gendicovar(data = EES2019_it,
+                               indices = 1501:1507, 
+                               stub = 'Q25'))
+
+
 # Dependent variables =================================================================================
 
 # Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -150,9 +202,9 @@ names(EES2019_it)[startsWith(colnames(EES2019_it), 'q10_')] <- paste0('q10_', se
 # Generate a set of dichotomous variables from the EP vote choice one - - - - - - - - - - - - - - - -
 
 EES2019_it <- cbind(EES2019_it, 
-                    gendepvar(data = EES2019_it,
-                              indices = 1501:1507, 
-                              stub = 'Q7'))
+                    gendicovar(data = EES2019_it,
+                               indices = 1501:1507, 
+                               stub = 'Q7'))
 
 rm(list=ls(pattern='df'))
 
@@ -188,7 +240,7 @@ EES2019_it_stacked %<>%
                 stacked_vc = Q7, 
                 dyad = paste0(respid, "-", party)) %>%
   dplyr::select(dyad, respid, party, ptv, stacked_vc, lr_dist, genderage_yhat, gndr, age)
-  
+
 
 
 

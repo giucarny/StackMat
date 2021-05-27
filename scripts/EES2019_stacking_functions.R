@@ -22,7 +22,7 @@ gendist <- function(data, indices, stub) {
 
 # Functions for generating dichotomous dependent variables - - - - - - - - - - - - - - - - - - - - - - 
 
-gendepvar.int.fun <- function(data, depvar, index) {
+gendicovar.int.fun <- function(data, depvar, index) {
   newvar = paste0(depvar, '_', index)
   data[[newvar]] <- data[[depvar]]
   exprss <- paste0('case_when(', newvar, '==', index, ' ~ 1, T ~ 0)')
@@ -34,8 +34,8 @@ gendepvar.int.fun <- function(data, depvar, index) {
   return(df2)
 }
 
-gendepvar <- function(data, indices, stub) {
-  df <- lapply(data=data, X = indices, depvar = stub, FUN = gendepvar.int.fun) %>% do.call('cbind',.)
+gendicovar <- function(data, indices, stub) {
+  df <- lapply(data=data, X = indices, depvar = stub, FUN = gendicovar.int.fun) %>% do.call('cbind',.)
   return(df)
 }
 
