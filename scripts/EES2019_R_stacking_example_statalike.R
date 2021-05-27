@@ -245,15 +245,52 @@ depvars <- paste0('Q7_', rel_prties)
 for(i in depvars) {
   EES2019_it <- genyhats(data=EES2019_it, 
                          depvar=i, 
-                         regtype='log',
+                         regtype='logit',
                          indvar = c("age"),
-                         newname = 'age')  
+                         newname = 'age_dich')  
+}
+rm(i, depvars)
+
+# Generate yhats for a continuous dependent variable
+
+depvars <- paste0('q10_', rel_prties)
+
+for(i in depvars) {
+  EES2019_it <- genyhats(data=EES2019_it, 
+                         depvar=i, 
+                         regtype = 'linear',
+                         indvar = c("age"),
+                         newname = 'age_cont')  
 }
 rm(i, depvars)
 
 
+# Age gender education yhats - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Generate yhats for a dichotomous dependent variable
 
+depvars <- paste0('Q7_', rel_prties)
 
+for(i in depvars) {
+  EES2019_it <- genyhats(data=EES2019_it, 
+                         depvar=i, 
+                         regtype='logit',
+                         indvar = c("age", "gndr", "edu1", "edu2", "edu3"),
+                         newname = 'socdem_dich')  
+}
+rm(i, depvars)
+
+# Generate yhats for a continuous dependent variable
+
+depvars <- paste0('q10_', rel_prties)
+
+for(i in depvars) {
+  EES2019_it <- genyhats(data=EES2019_it, 
+                         depvar=i, 
+                         regtype = 'linear',
+                         indvar = c("age", "gndr", "edu1", "edu2", "edu3"),
+                         newname = 'socdem_cont')  
+}
+rm(i, depvars)
 
 
 # Stack the observations ==============================================================================

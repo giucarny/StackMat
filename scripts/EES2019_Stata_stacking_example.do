@@ -53,6 +53,7 @@ drop D4_1
 
 // Rename the gender variable - - - - - - - - - - - - - - - - - - - - - - - - - 
 ren D3 gndr
+ren EDU edu
 
 
 *  Select the relevant parties =================================================
@@ -158,7 +159,6 @@ replace q10_`j'=. if q10_`j'>10
 }
 
 // Rescale the PTV values - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 forvalues j = 1/7 {
 replace q10_`j'= q10_`j'/10
 }
@@ -179,13 +179,12 @@ forvalues j = 1501/1507 {
 }
 
 
-* socdemgraphic yhats =======================================================
+* Sociodemographic yhats =======================================================
 
-* Recode the missing values of education - - - - - - - - - - - - - - - - - - - -
-ren EDU edu
+* Recode edu variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 replace edu = . if edu > 3
 
-* Create dummy variables for educatio - - - - - - - - - - - - - - - - - - - - - 
+* Create a set of dummy variables for education - - - - - - - - - - - - - - - - 
 
 forvalues i = 1/3 {
 gen edu`i' = edu 
@@ -200,7 +199,7 @@ replace gndr = . if gndr==3
 * age - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
 forvalues j = 1/7 {
-genyhats age_yhat_dico_150`j': age, dep(Q7_150`j') log adjust(no)	
+genyhats age_yhat_dich_150`j': age, dep(Q7_150`j') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
@@ -212,7 +211,7 @@ genyhats age_yhat_cont_150`j': age, dep(q10_150`j') adjust(no)
 * age gender education - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
 forvalues j = 1/7 {
-genyhats socdem_yhat_dico_150`j': age gndr edu1 edu2 edu3, dep(Q7_150`j') log adjust(no)	
+genyhats socdem_yhat_dich_150`j': age gndr edu1 edu2 edu3, dep(Q7_150`j') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
@@ -233,8 +232,8 @@ drop edu1 edu2 edu3
 * help genstacks
 
 genstacks q10_ Q7_ q13_ q24_ Q25_ /// 
-age_yhat_dico_ age_yhat_cont_ ///
-socdem_yhat_dico_ socdem_yhat_cont_, rep
+age_yhat_dich_ age_yhat_cont_ ///
+socdem_yhat_dich_ socdem_yhat_cont_, rep
 
 
 * Mutate the dataset ===========================================================
@@ -247,9 +246,9 @@ ren Q7_ stacked_vc
 ren q13_ lr_dist
 ren q24_ eu_dist
 ren Q25_ pid
-ren age_yhat_dico_ age_yhat_dico
+ren age_yhat_dich_ age_yhat_dich
 ren age_yhat_cont_ age_yhat_cont
-ren socdem_yhat_dico_ socdem_yhat_dico
+ren socdem_yhat_dich_ socdem_yhat_dich
 ren socdem_yhat_cont_ socdem_yhat_cont
 
 * Generate a party-voter 'dyad' variable - - - - - - - - - - - - - - - - - - - -
