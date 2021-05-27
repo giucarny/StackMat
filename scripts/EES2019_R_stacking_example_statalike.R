@@ -21,15 +21,18 @@ options(scipen = 99)
 rm(list = ls())
 
 # Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 if (grepl('StackMat-master', getwd())==F) {
   setwd(paste0(getwd(), '/StackMat-master/'))
   source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
+} else {
   if (grepl('scripts', getwd())==F) {
     source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
   } else {
     source('EES2019_stacking_functions.R')
   }
 }
+
 
 # Load data # =========================================================================================
 
