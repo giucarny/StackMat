@@ -42,28 +42,35 @@ gendicovar <- function(data, indices, stub) {
 
 # Y-hat fun - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-genyhats <- function(data, depvar, indvar, newname) {
+genyhats <- function(data, depvar, regtype, indvar, newname) {
   
   frmla <- as.formula(paste(depvar, paste(indvar, collapse = " + "), sep = " ~ "))
   
   ics <- data %>% dplyr::select(all_of(depvar), all_of(indvar))
 
-  for(i in 2:length(ics)) {
-    vec <- ics[[i]]
-
-    cl <- class(ics[[i]])
-
-    if(cl=='numeric') {
-      ics[[i]] <- ifelse(is.na(vec), mean(vec, na.rm=T) , vec)
-    } else if (cl=='factor') {
-      ics[[i]] <- ifelse(is.na(vec), median(vec, na.rm=T) , vec)
-    }
+  # for(i in 2:length(ics)) {
+  #   vec <- ics[[i]]
+  # 
+  #   cl <- class(ics[[i]])
+  # 
+  #   if(cl=='numeric') {
+  #     ics[[i]] <- ifelse(is.na(vec), mean(vec, na.rm=T) , vec)
+  #   } else if (cl=='factor') {
+  #     ics[[i]] <- ifelse(is.na(vec), median(vec, na.rm=T) , vec)
+  #   }
+  # }
+  
+  if (regtype=='logit' | regtype=='log') {
+    x <- glm(frmla, data = ics, family = "binomial")
+    
+    outcome <- data.frame(respos = predict(x) %>% attr(., 'names') %>% as.numeric(),
+                          yhat = predict(x, type='response'))
+  } else {
+    x <- lm(frmla, data = ics)
+    
+    outcome <- data.frame(respos = predict(x) %>% attr(., 'names') %>% as.numeric(),
+                          yhat = predict(x))
   }
-
-  x <- glm(frmla, data = ics, family = "binomial")
-
-  outcome <- data.frame(respos = predict(x) %>% attr(., 'names') %>% as.numeric(),
-                        yhat = predict(x, type='response'))
 
   respid <- data.frame(respos = 1:nrow(data),
                        respid = data$respid)

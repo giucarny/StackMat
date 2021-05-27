@@ -211,15 +211,50 @@ rm(list=ls(pattern='df'))
 
 # Sociodemographic yhats ==============================================================================
 
+# Recode edu variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>%
+  dplyr::mutate(edu = case_when(edu>3 ~ NA_real_, 
+                                T ~ edu))
+
+# Create a set of dummy variables for edu - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>%
+  dplyr::mutate(edu1 = case_when(edu==1 ~ 1, 
+                                 edu==2 | edu==3 ~ 0, 
+                                 T ~ edu), 
+                edu2 = case_when(edu==2 ~ 1, 
+                                 edu==1 | edu==3 ~ 0, 
+                                 T ~ edu), 
+                edu3 = case_when(edu==3 ~ 1, 
+                                 edu==1 | edu==2 ~ 0, 
+                                 T ~ edu)) 
+
+
+# Recode gender (category 3 with too few observations) - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>% 
+  dplyr::mutate(gndr = case_when(gndr==3 ~ NA_real_, 
+                                 T ~ gndr))
+
+# Age yhats - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Generate yhats for a dichotomous dependent variable
+
 depvars <- paste0('Q7_', rel_prties)
 
 for(i in depvars) {
   EES2019_it <- genyhats(data=EES2019_it, 
                          depvar=i, 
-                         indvar = c("gndr", "age"),
-                         newname = 'genderage')  
+                         regtype='log',
+                         indvar = c("age"),
+                         newname = 'age')  
 }
 rm(i, depvars)
+
+
+
+
+
 
 # Stack the observations ==============================================================================
 
