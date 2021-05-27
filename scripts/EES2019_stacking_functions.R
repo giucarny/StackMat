@@ -7,7 +7,7 @@
 # Functions for generating party-voter distances - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 gendist.int.fun <- function(data, index, basevar){
-  exprss <- paste0('abs(', basevar, '_', index, '-', basevar, '_', index, '_mean', ')')
+  exprss <- paste0('1-((abs(10-1) - abs(', basevar, '_', index, '-', basevar, '_', index, '_mean', '))/abs(10-1))')
   newvar <- paste0(basevar, '_', index, "dist")
   q <- quote(mutate(data, !! newvar := exprss))
   df2 <- eval(parse(text=sub("exprss", exprss, deparse(q)))) %>% dplyr::select(all_of(newvar))

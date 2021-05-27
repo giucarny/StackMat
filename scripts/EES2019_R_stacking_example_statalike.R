@@ -21,7 +21,6 @@ options(scipen = 99)
 rm(list = ls())
 
 # Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 if (grepl('StackMat-master', getwd())==F) {
   setwd(paste0(getwd(), '/StackMat-master/'))
   source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
@@ -50,7 +49,17 @@ rm(EES2019)
 
 # Select the relevant variables # =====================================================================
 
-EES2019_it %<>% dplyr::select(respid, Q7, starts_with('q10'), Q11, starts_with('q13'), D3, D4_1)
+EES2019_it %<>% dplyr::select(respid, 
+                              Q7, 
+                              starts_with('q10'), 
+                              Q11, 
+                              starts_with('q13'), 
+                              D3, 
+                              D4_1,
+                              Q23,
+                              starts_with('q24'),
+                              Q25,
+                              EDU)
 
 
 # Create additional variables # =======================================================================
