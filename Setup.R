@@ -36,20 +36,27 @@ if (!dir.exists(paths = 'StackMat-master')) {
   dwnld.files()
 } else {
   if (!dir.exists(paste0(getwd(), '/StackMat-master/data/')) | 
-      !dir.exists(paste0(getwd(), '/StackMat-master/scripts/'))) {
+      !dir.exists(paste0(getwd(), '/StackMat-master/scripts/')) |
+      !dir.exists(paste0(getwd(), '/StackMat-master/documentation/'))) {
     dwnld.files()
   } else {
     data.dir.fls <- paste0(paste0(getwd(), '/StackMat-master/data/'), 
                            c('EES2019_Questionnaire.pdf', 
                              'ZA7581_v1-0-0.dta',
                              'ZA7581_cp_mod.csv',
-                             'EES2019_it_stacked.csv'))
+                             'EES2019_it_stacked.csv'
+                             ))
     script.dir.fls <- paste0(paste0(getwd(), '/StackMat-master/scripts/'), 
-                             c('EES2019_stacking_example.R'))
+                             c('EES2019_stacking_functions.R',
+                               'EES2019_R_stacking_example.R',
+                               'EES2019_R_stacking_example_statalike.R',
+                               'EES2019_Stata_stacking_example.do'
+                               ))
     doc.dir.fls <- paste0(paste0(getwd(), '/StackMat-master/documentation/'), 
                              c('rmd_inheader.tex', 
                                'StackMat - Software Setup.Rmd',
-                               'StackMat---Software-Setup.pdf'))
+                               'StackMat---Software-Setup.pdf'
+                               ))
     if (!all(file.exists(data.dir.fls)) | 
         !all(file.exists(script.dir.fls)) |
         !all(file.exists(doc.dir.fls))) {
