@@ -93,7 +93,7 @@ genstacks <- function(idvar, data, stubs, keepvar) {
   
   for (i in stubs) {
     df2 <- data %>% 
-      dplyr::select(idvar, starts_with(paste0(i, '_'))) %>%
+      dplyr::select(all_of(idvar), starts_with(paste0(i, '_'))) %>%
       pivot_longer(cols = starts_with(paste0(i, '_')),
                    names_to = paste0(i, '_n'), 
                    values_to = i)
