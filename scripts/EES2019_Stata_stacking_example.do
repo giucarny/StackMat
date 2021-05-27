@@ -1,7 +1,7 @@
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 * Title: Script for Stacking Data (EES 2019 Voter Study, Italian Sample) 
 * Author: G.Carteny
-* last update: 2021-05-26
+* last update: 2021-05-27
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 * Install the 'StackMe' package if not already done ============================
@@ -199,25 +199,25 @@ replace gndr = . if gndr==3
 * age - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
 forvalues j = 1/7 {
-genyhats age_yhat_dich_150`j': age, dep(Q7_150`j') log adjust(no)	
+genyhats age_dich_yhat_150`j': age, dep(Q7_150`j') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
 
 forvalues j = 1/7 {
-genyhats age_yhat_cont_150`j': age, dep(q10_150`j') adjust(no)	
+genyhats age_cont_yhat_150`j': age, dep(q10_150`j') adjust(no)	
 }
 
 * age gender education - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
 forvalues j = 1/7 {
-genyhats socdem_yhat_dich_150`j': age gndr edu1 edu2 edu3, dep(Q7_150`j') log adjust(no)	
+genyhats socdem_dich_yhat_150`j': age gndr edu1 edu2 edu3, dep(Q7_150`j') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
 
 forvalues j = 1/7 {
-genyhats socdem_yhat_cont_150`j': age gndr edu1 edu2 edu3, dep(q10_150`j') adjust(no)	
+genyhats socdem_cont_yhat_150`j': age gndr edu1 edu2 edu3, dep(q10_150`j') adjust(no)	
 }
 
 
@@ -232,8 +232,8 @@ drop edu1 edu2 edu3
 * help genstacks
 
 genstacks q10_ Q7_ q13_ q24_ Q25_ /// 
-age_yhat_dich_ age_yhat_cont_ ///
-socdem_yhat_dich_ socdem_yhat_cont_, rep
+age_dich_yhat_ age_cont_yhat_ ///
+socdem_dich_yhat_ socdem_cont_yhat_, rep
 
 
 * Mutate the dataset ===========================================================
@@ -246,10 +246,10 @@ ren Q7_ stacked_vc
 ren q13_ lr_dist
 ren q24_ eu_dist
 ren Q25_ pid
-ren age_yhat_dich_ age_yhat_dich
-ren age_yhat_cont_ age_yhat_cont
-ren socdem_yhat_dich_ socdem_yhat_dich
-ren socdem_yhat_cont_ socdem_yhat_cont
+ren age_dich_yhat_ age_dich_yhat
+ren age_cont_yhat_ age_cont_yhat
+ren socdem_dich_yhat_ socdem_dich_yhat
+ren socdem_cont_yhat_ socdem_cont_yhat
 
 * Generate a party-voter 'dyad' variable - - - - - - - - - - - - - - - - - - - -
 tostring respid, gen(respid2)
