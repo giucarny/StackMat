@@ -36,9 +36,9 @@ if (grepl('StackMat-master', getwd())==F) {
 # Load data # =========================================================================================
 
 # Load the EES 2019 voter study dataset (Stata version) # - - - - - - - - - - - - - - - - - - - - - - -
-EES2019 <- haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta'))
-
-EES2019 <- haven::zap_labels(EES2019) # Remove labels
+EES2019 <- 
+  haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta')) %>%
+  haven::zap_labels(.)
 
 
 # Select country-specific data frames for stacking # ==================================================
@@ -328,5 +328,8 @@ EES2019_it_stacked %<>%
   dplyr::select(dyad, respid, party, ptv, stacked_vc, lr_dist, ends_with('yhat'), gndr, age)
 
 
+# Save the stacked data frame # =======================================================================
 
+setwd(paste0(getwd(), '/data/'))
+fwrite(EES2019_it_stckd, file='EES2019_it_stacked.csv')
 

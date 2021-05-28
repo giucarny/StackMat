@@ -20,7 +20,7 @@ gendist <- function(data, indices, stub) {
 }
 
 
-# Functions for generating dichotomous dependent variables - - - - - - - - - - - - - - - - - - - - - - 
+# Functions for generating dichotomous variables - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 gendicovar.int.fun <- function(data, depvar, index) {
   newvar = paste0(depvar, '_', index)
