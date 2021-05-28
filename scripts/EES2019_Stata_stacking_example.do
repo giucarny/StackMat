@@ -239,13 +239,13 @@ socdem_dich_yhat_ socdem_cont_yhat_, rep
 * Mutate the dataset ===========================================================
 
 * Drop and rename some variables - - - - - - - - - - - - - - - - - - - - - - - -
-drop Q7 genstacks_stack genstacks_nstacks
+drop genstacks_stack genstacks_nstacks
 ren genstacks_item party
 ren q10_ ptv
-ren Q7_ stacked_votechoice
+ren Q7_ stacked_votech
 ren q13_ lr_dist
 ren q24_ eu_dist
-ren Q25_ pid
+ren Q25_ stacked_pid
 ren age_dich_yhat_ age_dich_yhat
 ren age_cont_yhat_ age_cont_yhat
 ren socdem_dich_yhat_ socdem_dich_yhat
@@ -258,9 +258,9 @@ gen stackid = respid2 + "-" + party2
 drop respid2 party2
 
 * Select the variables to keep and reorder them - - - - - - - - - - - - - - - - 
-keep stackid respid party ptv stacked_votechoice lr_dist eu_dist pid age_* /// 
+keep stackid respid party ptv stacked_votech lr_dist eu_dist stacked_pid age_* /// 
 socdem* age gndr edu
-order stackid respid party ptv stacked_votechoice lr_dist eu_dist pid age_* ///
+order stackid respid party ptv stacked_votech lr_dist eu_dist stacked_pid age_* ///
 socdem* age gndr edu
 
 

@@ -19,7 +19,7 @@ This document consists in the codebook of the stacked European Election Studies 
 * Identification Variables 
 * Voting Behaviour Variables
 * Voter-Party Distance Variables
-* Generic/Synthetic Variables
+* Generic and Synthetic Variables
 
 
 # Identification Variables {-}
@@ -31,10 +31,10 @@ Unique identifier of party-voter dyadic relationships. It represents the combina
 Example: The dyad referring to the relationship between the respondent identified by the number 778 and the Italian Democratic Party (*Partito Democratico*; code 1501) would be '778-1501'. 
 
 ## respid {-}
-Unique identifier of individual respondents as it was assigned in the EES 2019 Italian voter study (`respid`; See the [EES2019 Code Plan](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+Unique identifier of individual respondents as it was assigned in the EES 2019 Italian voter study (`respid`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
 
 ## party {-}
-Unique identifier of the Italian parties participating to the European Parliament (EP) elections of 2019. Values equate to those defined in the original EES 2019 vote choice variable referring to the 2019 EP elections (`Q7`; See the [EES2019 Code Plan](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). Only parties for which propensity to vote (PTV) variables where available in the EES 2019 Italian voter study have been selected. 
+Unique identifier of the Italian parties participating to the European Parliament (EP) elections of 2019. Values equate to those defined in the original EES 2019 vote choice variable referring to the 2019 EP elections (`Q7`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). Only parties for which propensity to vote (PTV) variables where available in the EES 2019 Italian voter study have been selected. 
 
 Values: 
 
@@ -46,7 +46,7 @@ Values:
 1506 - More Europe (*+Europa*)  
 1507 - Brothers of Italy (*Fratelli d'Italia*)  
 
-99 - missing
+99 - Missing
 
 \medskip
 
@@ -81,8 +81,46 @@ df %>%
 
 ```
 
+# Voting Behaviour Variables {-}
+
+## votech {-}
+
+EES 2019 original vote choice variable, referring to 2019 EP elections respondents' self reported vote choice (`Q7`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). 
+
+Values: 
+
+1501 - Democratic Party (*Partito Democratico*)  
+1502 - Go Italy (*Forza Italia*)  
+1503 - Northern League (*Lega - Salvini Premier*)  
+1504 - Five Star Movement (*Movimento 5 Stelle*)  
+1505 - Italian Left (*Sinistra Italiana*)  
+1506 - More Europe (*+Europa*)  
+1507 - Brothers of Italy (*Fratelli d'Italia*)  
+
+99 - Missing
+
+# Generic and Synthetic Variables {-}
+
+## stacked_votech {-}
+
+Dichotomous vote choice variable, measuring whether the respondent voted for the stack party. Recoded from the EES 2019 original vote choice variable (`votech`)
+
+0 - Did not vote for the stack party  
+1 - Did vote for the stack party
+
+99 - Missing
+
+## stacked_pid {-}
+
+Dichotomous vote choice variable, measuring whether the respondent identifies with the stack party. Recoded from the EES 2019 original party identification variable (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448))
+
+0 - Does not identify with the stack party  
+1 - Do identify with the stack party
+
+99 - Missing
+
 ## ptv {-}
-The degree of propensity to vote (PTV) for the stack party. Rescaled from the EES 2019 PTV variables (Prefix: `Q10_`; See the [EES2019 Code Plan](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+The degree of propensity to vote (PTV) for the stack party. Rescaled from the EES 2019 PTV variables (Prefix: `Q10_`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
 
 Values: 
  
@@ -91,8 +129,6 @@ Values:
 1 - very high  
 
 99 - missing
-
-## stacked_votech
 
 
 

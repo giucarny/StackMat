@@ -305,12 +305,14 @@ EES2019_it %<>% dplyr::select(-c(edu1, edu2, edu3))
 
 # Stack the observations ==============================================================================
 
+names(EES2019_it)[names(EES2019_it)=="Q7"] <- 'votech'
+
 EES2019_it_stacked <- genstacks(data = EES2019_it, 
                                 idvar = 'respid', 
                                 stubs = c('q10', 'q13', 'q24', 'Q7', 'Q25',
                                           'age_cont_yhat', 'age_dich_yhat', 
                                           'socdem_dich_yhat', 'socdem_cont_yhat'),
-                                keepvar = c('gndr', 'age', 'Q7'))
+                                keepvar = c('gndr', 'age', 'votech'))
 
 # Mutate the dataset ==================================================================================
 
@@ -320,13 +322,12 @@ EES2019_it_stacked %<>%
   dplyr::mutate(respid = Var1, 
                 party = Var2, 
                 ptv = q10, 
-                votech = Q7,
                 stacked_votech = Q7, 
                 lr_dist = q13,
                 eu_dist = q24,
                 pid = Q25,
                 stackid = paste0(respid, "-", party)) %>%
-  dplyr::select(stackid, respid, party, ptv, Q7, stacked_votech, lr_dist, ends_with('yhat'), gndr, age)
+  dplyr::select(stackid, respid, party, votech, stacked_votech, ptv, lr_dist, ends_with('yhat'), gndr, age)
 
 
 # Save the stacked data frame # =======================================================================
