@@ -330,5 +330,5 @@ EES2019_it_stacked %<>%
 
 # Save the stacked data frame # =======================================================================
 
-fwrite(EES2019_it_stcked, file=paste0(getwd(), '/data/', 'EES2019_it_stacked.csv'))
+fwrite(EES2019_it_stacked, file=paste0(getwd(), '/data/', 'EES2019_it_stacked.csv'))
 
