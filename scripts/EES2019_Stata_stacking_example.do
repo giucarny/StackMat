@@ -242,7 +242,7 @@ socdem_dich_yhat_ socdem_cont_yhat_, rep
 drop Q7 genstacks_stack genstacks_nstacks
 ren genstacks_item party
 ren q10_ ptv
-ren Q7_ stacked_vc
+ren Q7_ stacked_votechoice
 ren q13_ lr_dist
 ren q24_ eu_dist
 ren Q25_ pid
@@ -251,14 +251,16 @@ ren age_cont_yhat_ age_cont_yhat
 ren socdem_dich_yhat_ socdem_dich_yhat
 ren socdem_cont_yhat_ socdem_cont_yhat
 
-* Generate a party-voter 'dyad' variable - - - - - - - - - - - - - - - - - - - -
+* Generate a party-voter 'stackid' variable - - - - - - - - - - - - - - - - - - - -
 tostring respid, gen(respid2)
 tostring party, gen(party2)
-gen dyad = respid2 + "-" + party2
+gen stackid = respid2 + "-" + party2
 drop respid2 party2
 
 * Select the variables to keep and reorder them - - - - - - - - - - - - - - - - 
-keep dyad respid party ptv stacked_vc lr_dist eu_dist pid age_* socdem* age gndr edu
-order dyad respid party ptv stacked_vc lr_dist eu_dist pid age_* socdem* age gndr edu
+keep stackid respid party ptv stacked_votechoice lr_dist eu_dist pid age_* /// 
+socdem* age gndr edu
+order stackid respid party ptv stacked_votechoice lr_dist eu_dist pid age_* ///
+socdem* age gndr edu
 
 

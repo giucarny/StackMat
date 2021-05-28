@@ -107,8 +107,8 @@ respid <- EES2019_it %>%
 EES2019_it_stckd <- 
   expand.grid(prty, respid) %>%                         # Combine the two vectors 
   dplyr::mutate(respid = Var2, party = Var1) %>%        # Rename the new columns 
-  dplyr::mutate(dyad = paste0(respid, '-', party)) %>%  # Create a variable for the voter-party combinations (dyads)
-  dplyr::select(dyad, respid, party)                    # Select and reorder the relevant columns
+  dplyr::mutate(stackid = paste0(respid, '-', party)) %>%  # Create a variable for the voter-party combinations (stackids)
+  dplyr::select(stackid, respid, party)                    # Select and reorder the relevant columns
 
 rm(prty, respid) # Remove the vectors created earlier
 
@@ -128,13 +128,13 @@ EES2019_it_stckd <-
   dplyr::left_join(EES2019_it_stckd, prtych.df, by='respid') # Join the data frames by the respondent id variable
 
 # The stacked data frame now has a column (vote_ch) with the party voted by each respondent. 
-# Thus the value of the vote choice is constant across all the party-voter dyads referring to the same 
+# Thus the value of the vote choice is constant across all the party-voter stackids referring to the same 
 # respondent. 
 # The following conditional statement, then, assigns the value 1 when the vote choice refers to one of
-# the parties selected to build the party-voter dyads, otherwise the value will be 0. 
+# the parties selected to build the party-voter stackids, otherwise the value will be 0. 
 
 EES2019_it_stckd %<>%         
-  dplyr::mutate(stacked_vc = case_when(vote_ch==party ~ 1,     
+  dplyr::mutate(stacked_votech = case_when(vote_ch==party ~ 1,     
                                        T ~ 0)) %>% 
   dplyr::select(-c(vote_ch))                               # Eliminate the original vote choice variable
 
@@ -148,7 +148,7 @@ rm(prtych.df)
 # First, a collateral data frame is created starting from the auxiliary data frame created earlier. 
 # The resulting data frame is thus constituted by a column collecting to the PTV variable name in the 
 # original EES 2019 voter study dataset and a second column referring to the parties selected for building 
-# the party-voter dyads.
+# the party-voter stackids.
 
 ptvs_prties <- 
   EES2019_aux_it %>% 
@@ -216,7 +216,7 @@ EES2019_it_stckd <- left_join(EES2019_it_stckd, df)   # Join the dataframe just 
 
 
 # At this point the stacked data frame has a column specifying individuals' LR self-pos. that is costant
-# within individuals, this within each voter-party dyad.
+# within individuals, this within each voter-party stackid.
 
 # The second step consists in creating a variable summarizing the distance between individuals' and each
 # relevant party on the LR scale. As a consequence what we need is a measure indicating the LR position 

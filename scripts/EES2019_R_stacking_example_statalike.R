@@ -310,22 +310,23 @@ EES2019_it_stacked <- genstacks(data = EES2019_it,
                                 stubs = c('q10', 'q13', 'q24', 'Q7', 'Q25',
                                           'age_cont_yhat', 'age_dich_yhat', 
                                           'socdem_dich_yhat', 'socdem_cont_yhat'),
-                                keepvar = c('gndr', 'age'))
+                                keepvar = c('gndr', 'age', 'Q7'))
 
 # Mutate the dataset ==================================================================================
 
-# Rename the variables, generate a party-voter 'dyad' variable, keep some variables, and reorder # - - 
+# Rename the variables, generate a party-voter 'stackid' variable, keep some variables, and reorder # - - 
 
 EES2019_it_stacked %<>%
   dplyr::mutate(respid = Var1, 
                 party = Var2, 
                 ptv = q10, 
-                stacked_vc = Q7, 
+                votech = Q7,
+                stacked_votech = Q7, 
                 lr_dist = q13,
                 eu_dist = q24,
                 pid = Q25,
-                dyad = paste0(respid, "-", party)) %>%
-  dplyr::select(dyad, respid, party, ptv, stacked_vc, lr_dist, ends_with('yhat'), gndr, age)
+                stackid = paste0(respid, "-", party)) %>%
+  dplyr::select(stackid, respid, party, ptv, Q7, stacked_votech, lr_dist, ends_with('yhat'), gndr, age)
 
 
 # Save the stacked data frame # =======================================================================

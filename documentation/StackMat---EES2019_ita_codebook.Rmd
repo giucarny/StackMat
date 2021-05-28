@@ -1,0 +1,98 @@
+---
+title: Stacked Data Matrices Workshop
+subtitle: EES 2019 Italian Voter Study - Stacked Dataset Codebook
+author: Giuseppe Carteny
+date: 26.05.2021 
+toc: true
+output: 
+  bookdown::pdf_document2:
+    includes:
+      in_header: rmd_inheader.tex
+urlcolor: blue
+---
+
+\newpage
+# Overview {-}
+
+This document consists in the codebook of the stacked European Election Studies (EES) Italian voter study of 2019 as created by the scripts provided for the workshop. The variables are grouped as it follows: 
+
+* Identification Variables 
+* Voting Behaviour Variables
+* Voter-Party Distance Variables
+* Generic/Synthetic Variables
+
+
+# Identification Variables {-}
+
+## stackid {-}
+
+Unique identifier of party-voter dyadic relationships. It represents the combination of EES 2019 Italian voter study (1) respondents' identification numbers (`respid`) and (2) party unique identifier variable (`party`). 
+
+Example: The dyad referring to the relationship between the respondent identified by the number 778 and the Italian Democratic Party (*Partito Democratico*; code 1501) would be '778-1501'. 
+
+## respid {-}
+Unique identifier of individual respondents as it was assigned in the EES 2019 Italian voter study (`respid`; See the [EES2019 Code Plan](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+
+## party {-}
+Unique identifier of the Italian parties participating to the European Parliament (EP) elections of 2019. Values equate to those defined in the original EES 2019 vote choice variable referring to the 2019 EP elections (`Q7`; See the [EES2019 Code Plan](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). Only parties for which propensity to vote (PTV) variables where available in the EES 2019 Italian voter study have been selected. 
+
+Values: 
+
+1501 - Democratic Party (*Partito Democratico*)  
+1502 - Go Italy (*Forza Italia*)  
+1503 - Northern League (*Lega - Salvini Premier*)  
+1504 - Five Star Movement (*Movimento 5 Stelle*)  
+1505 - Italian Left (*Sinistra Italiana*)  
+1506 - More Europe (*+Europa*)  
+1507 - Brothers of Italy (*Fratelli d'Italia*)  
+
+99 - missing
+
+\medskip
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, eval=F}
+
+library(knitr)
+library(kableExtra)
+
+options(knitr.kable.NA = '')
+options(knitr.table.format = "latex")
+
+df <- 
+  data.frame(
+  'pname_it' = c('Partito Democratico', 'Forza Italia', 
+                        'Lega - Salvini Premier', 'Movimento 5 Stelle', 
+                        'Sinistra Italiana', '+Europa', 
+                        "Fratelli d'Italia - Centrodestra Nazionale"),
+  'pname_en' = c('Democratic Party', 'Go Italy', 
+                        'Northern League', 'Five Star Movement', 
+                        'Italian Left', 'More Europe', 
+                        "Brothers of Italy - National Centre-right"),
+  'pcode' = c(1501:1507)
+)
+
+names(df) <- c('Party Name (it)', 'Party Name (en)', 'Party Code')
+
+df %>%
+  knitr::kable(format="latex", longtable = F, # caption = "List of Parties Available in the Dataset",
+               booktabs=T, linesep = "", align = c('l','l','c')) %>%
+  kable_classic()
+
+
+```
+
+## ptv {-}
+The degree of propensity to vote (PTV) for the stack party. Rescaled from the EES 2019 PTV variables (Prefix: `Q10_`; See the [EES2019 Code Plan](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+
+Values: 
+ 
+0 - very low  
+...  
+1 - very high  
+
+99 - missing
+
+## stacked_votech
+
+
+
