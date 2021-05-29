@@ -24,9 +24,11 @@ gendist <- function(data, indices, stub1, stub2) {
 # Functions for generating dichotomous variables - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 gendicovar.int.fun <- function(data, depvar, index) {
-  newvar = paste0(depvar, '_', index)
+  newvar = paste0(depvar, '_stack_', index)
   data[[newvar]] <- data[[depvar]]
-  exprss <- paste0('case_when(', newvar, '==', index, ' ~ 1, T ~ 0)')
+  exprss <- paste0('case_when(', newvar, '==', index, ' ~ 1,', 
+                              'is.na(', newvar, ') ~ NA_real_,',
+                              'T ~ 0)')
   q <- quote(mutate(data, !! newvar := exprss))
   df2 <- 
     eval(parse(text=sub("exprss", exprss, deparse(q)))) %>% 
