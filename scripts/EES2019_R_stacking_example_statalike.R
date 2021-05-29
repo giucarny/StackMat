@@ -89,6 +89,13 @@ EES2019_it %<>%
   dplyr::mutate(across(starts_with('q13'), ~case_when(.>10 ~ NA_real_,
                                                       T ~ .)))
 
+
+# Generate rescaled versions of the original individual variables - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>%
+  dplyr::mutate(Q11 = Q11/10) %>%
+  dplyr::mutate(across(starts_with('q13'), ~./10))
+
 # Generate mean values of party positions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
@@ -106,8 +113,8 @@ EES2019_it <- cbind(EES2019_it,
 # Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
-  dplyr::select(-c(Q11, 
-                   ends_with('mean'),
+  dplyr::select(-c(#Q11, 
+                   #ends_with('mean'),
                    paste0('q13_', seq(1,7,1))))
 
 
@@ -133,6 +140,14 @@ EES2019_it %<>%
   dplyr::mutate(across(starts_with('q24'), ~case_when(.>10 ~ NA_real_,
                                                       T ~ .)))
 
+
+
+# Generate rescaled versions of the original individual variables - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>%
+  dplyr::mutate(Q23 = Q23/10) %>%
+  dplyr::mutate(across(starts_with('q24'), ~./10))
+
 # Generate mean values of party positions on EU integration - - - - - - - - - - - - - - - - - - - - - -
 
 EES2019_it %<>%
@@ -150,8 +165,8 @@ EES2019_it <- cbind(EES2019_it,
 # Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
-  dplyr::select(-c(Q23, 
-                   ends_with('mean'),
+  dplyr::select(-c(#Q23, 
+                   #ends_with('mean'),
                    paste0('q24_', seq(1,7,1))))
 
 

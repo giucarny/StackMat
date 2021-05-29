@@ -14,21 +14,15 @@ urlcolor: blue
 \newpage
 # Overview {-}
 
-This document consists in the codebook of the stacked European Election Studies (EES) Italian voter study of 2019 as created by the scripts provided for the workshop. The variables are grouped as it follows: 
+This document consists in the codebook of the stacked European Election Studies (EES) Italian voter study of 2019 as created by the scripts provided for the workshop. The logic and structure of the codebook resembles those of the True European Voter (TEV) codebook. The variables available in the dataset are grouped as it follows: 
 
 * Identification Variables 
-* Voting Behaviour Variables
-* Voter-Party Distance Variables
+* Voting Behaviour and Background Variables
+* Voter-Party Positional Variables
 * Generic and Synthetic Variables
 
 
 # Identification Variables {-}
-
-## stackid {-}
-
-Unique identifier of party-voter dyadic relationships. It represents the combination of EES 2019 Italian voter study (1) respondents' identification numbers (`respid`) and (2) party unique identifier variable (`party`). 
-
-Example: The dyad referring to the relationship between the respondent identified by the number 778 and the Italian Democratic Party (*Partito Democratico*; code 1501) would be '778-1501'. 
 
 ## respid {-}
 Unique identifier of individual respondents as it was assigned in the EES 2019 Italian voter study (`respid`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
@@ -48,7 +42,11 @@ Values:
 
 99 - Missing
 
-\medskip
+## stackid {-}
+Unique identifier of party-voter dyadic relationships. It represents the combination of EES 2019 Italian voter study (1) respondents' identification numbers (`respid`) and (2) party unique identifier variable (`party`). 
+
+Example: The dyad referring to the relationship between the respondent identified by the number 778 and the Italian Democratic Party (*Partito Democratico*; code 1501) would be '778-1501'. 
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, eval=F}
 
@@ -81,10 +79,9 @@ df %>%
 
 ```
 
-# Voting Behaviour Variables {-}
+# Voting Behaviour and Background Variables {-}
 
 ## votech {-}
-
 EES 2019 original vote choice variable, referring to 2019 EP elections respondents' self reported vote choice (`Q7`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). 
 
 Values: 
@@ -99,36 +96,204 @@ Values:
 
 99 - Missing
 
+## pid {-}
+EES 2019 original party identification variable (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). 
+
+Values:
+
+1501 - Does identify with political party 1501  
+...   
+1507 - Does identify with political party 1507  
+
+99 - Missing
+
+
+## age {-}
+Age of the respondents. Computed by substracting the EES 2019 respondents' birth year variable (`D4_1`) to the survey year (2019). 
+
+Values: 
+
+999 - Missing
+
+
+## gndr {-}
+The gender of the respondent, recoded from the original EES 2019 gender variable (`D3`). Recoded from the original in order to create a dichotomous variable given the low number of respondents part of the original category 'Other' (2 observations for the EES 2019 Italian voter study).
+
+Values:
+
+1 - Male  
+2 - Female
+
+99 - Missing
+
+
+## edu {-}
+Years of education of the respondent, recoded from the original EES 2019 education variable (`EDU`).
+
+Values: 
+
+1 - 15 years and less  
+2 - 16-19 years  
+3 - 20+ years
+
+99 - Missing
+
+
+# Voter-Party Positional Variables {-}
+
+## lr_self {-}
+Respondent Left-Right self placement measure, rescaled for the original EES 2019 variable (`Q11`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+
+Values: 
+
+0 - Left  
+...  
+1 - Right
+
+99 - Missing  
+
+
+## lr_party {-}
+Political party Left-Right position. Created computing the mean of all the EES respondents' perceptions of each relevant party position on the left–right dimension (Prefix: `Q13_`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448).
+
+Values: 
+
+0 - Left  
+...  
+1 - Right
+
+99 - Missing  
+
+
+## euint_self  {-}
+Respondent attitude toward the European Union (EU) integration process. Rescaled for the original EES 2019 variable (`Q23`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+
+Values: 
+
+0 - EU integration^[In the original [EES 2019 Master Questionnaire](https://dbk.gesis.org/dbksearch/download.asp?id=67447) reference is made to EU *unification* rather than *integration* process. Nonetheless, the two concepts can be considered almost equivalent.] has already gone too far  
+...  
+1 - EU integration should be pushed further
+
+99 - Missing  
+
+
+## euint_party  {-}
+Political party position about the European Union (EU) integration process. Created computing the mean of all the EES respondents' perceptions of each relevant party position about the EU integration process (Prefix: `Q24_`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
+
+Values: 
+
+0 - Against further EU integration  
+...  
+1 - Supporting EU integration 
+
+99 - Missing  
+
+
 # Generic and Synthetic Variables {-}
 
-## stacked_votech {-}
-
-Dichotomous vote choice variable, measuring whether the respondent voted for the stack party. Recoded from the EES 2019 original vote choice variable (`votech`)
-
-0 - Did not vote for the stack party  
-1 - Did vote for the stack party
-
-99 - Missing
-
-## stacked_pid {-}
-
-Dichotomous vote choice variable, measuring whether the respondent identifies with the stack party. Recoded from the EES 2019 original party identification variable (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448))
-
-0 - Does not identify with the stack party  
-1 - Do identify with the stack party
-
-99 - Missing
 
 ## ptv {-}
 The degree of propensity to vote (PTV) for the stack party. Rescaled from the EES 2019 PTV variables (Prefix: `Q10_`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)).
 
 Values: 
  
-0 - very low  
+0 - Very low  
 ...  
-1 - very high  
+1 - Very high  
 
-99 - missing
+99 - Missing
+
+
+## stacked_votech {-}
+Dichotomous vote choice variable, measuring whether the respondent voted for the stack party. Recoded from the EES 2019 original vote choice variable (`votech`).
+
+Values: 
+
+0 - Did not vote for the stack party  
+1 - Did vote for the stack party
+
+99 - Missing
+
+
+## stacked_pid {-}
+Dichotomous vote choice variable, measuring whether the respondent identifies with the stack party. Recoded from the party identification variable (`pid`).
+
+Values: 
+
+0 - Does not identify with the stack party  
+1 - Does identify with the stack party
+
+99 - Missing
+
+
+## lr_dist  {-}
+Distance between respondent and the stack party on the Left-Right dimension. This variable is the absolute difference of the respondent Left-Right self placement measure (`lr_self`) and the party positions on the same *continuum* (`lr_party`). 
+
+Values: 
+
+0 - Minimum distance between respondent and stack party  
+...  
+1 - Maximum distance between respondent and stack party  
+
+99 - Missing
 
 
 
+## euint_dist {-}
+Distance between respondent and the stack party about the European Union (EU) integration process. This variable is the absolute difference of the respondent attitude toward the European Union integration process. (`euint_self`) and the party positions on the same *continuum* (`euint_party`). 
+
+Values: 
+
+0 - Minimum distance between respondent and stack party  
+...  
+1 - Maximum distance between respondent and stack party  
+
+99 - Missing
+
+
+## age_dich_yhat {-}
+Y-hats, calculated by way of binary logistic regressions in the form of predicted probabilities of voting for the stack party (`votech`) on the basis of the respondent age variable (`age`). They are not centered.
+
+Values: 
+
+0  
+...  
+1
+
+99 - Missing
+
+
+## age_cont_yhat {-}
+Y-hats, calculated by way of Ordinary Least Squares (OLS) regressions in the form of linear predictions of the degree of propensity to vote for the stack party (`ptv`) on the basis of the respondent age variable (`age`). They are not centered.
+
+Values: 
+
+0  
+...  
+1
+
+99 - Missing
+
+## socdem_dich_yhat {-}
+Y-hats, calculated by way of binary logistic regressions in the form of predicted probabilities of voting for the stack party (`votech`) on the basis of respondents' age (`age`), gender (`gndr`), and education (`edu`) variables. They are not centered.
+
+Values: 
+
+0  
+...  
+1
+
+99 - Missing
+
+
+
+## age_cont_yhat {-}
+Y-hats, calculated by way of Ordinary Least Squares (OLS) regressions in the form of linear predictions of the degree of propensity to vote for the stack party (`ptv`) on the basis of respondents' age (`age`), gender (`gndr`), and education (`edu`) variables. They are not centered.
+
+Values: 
+
+0  
+...  
+1
+
+99 - Missing

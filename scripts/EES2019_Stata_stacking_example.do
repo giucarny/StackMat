@@ -73,28 +73,32 @@ forvalues j = 1/7 {
 replace q13_`j'=. if q13_`j'>10 
 }
 
+// Generate a rescaled stacked version of the original individual variable - - -
+forvalues j = 1501/1507 {
+gen Q11_`j'=Q11/10
+}
+
+// Rescale individual perceptions of party positions - - - - - - - - - - - - - -
+forvalues i = 1/7 {
+    replace q13_`i' = q13_`i'/10	
+}
+
 // Generate mean values of party positions - - - - - - - - - - - - - - - - - - -
 forvalues i = 1/7 {
-egen q13_`i'mean = mean(q13_`i')	
+egen q13_mean_150`i' = mean(q13_`i')	
 }
 
 // Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - -
 forvalues j = 1/7 {
-gen q13_`j'dist = 1-((abs(10-1) - abs(q13_`j'mean - Q11))/abs(10-1))
+gen q13_dist_150`j' = abs(q13_mean_150`j' - Q11_150`j')
 }
 
 // Drop the variables used for computing the distances - - - - - - - - - - - - -
 drop Q11
-drop *mean
 forvalues j = 1/7 {
 drop q13_`j'
 }
 
-// Rename the generated variables for stacking - - - - - - - - - - - - - - - - -
-local oldnm q13_1dist q13_2dist q13_3dist q13_4dist q13_5dist q13_6dist q13_7dist
-local newnm q13_1501 q13_1502 q13_1503 q13_1504 q13_1505 q13_1506 q13_1507
-
-ren (`oldnm') (`newnm')
 
 
 * EU integration distances =====================================================
@@ -109,28 +113,32 @@ forvalues j = 1/7 {
 replace q24_`j'=. if q24_`j'>10 
 }
 
+// Generate a rescaled stacked version of the original individual variable - - -
+forvalues j = 1501/1507 {
+gen Q23_`j'=Q23/10
+}
+
+// Rescale individual perceptions of party positions - - - - - - - - - - - - - -
+forvalues i = 1/7 {
+    replace q24_`i' = q24_`i'/10	
+}
+
+
 // Generate mean values of party positions on EU integration - - - - - - - - - -
 forvalues i = 1/7 {
-egen q24_`i'mean = mean(q24_`i')	
+egen q24_mean_150`i' = mean(q24_`i')	
 }
 
 // Generate EU integration distance variables - - - - - - - - - - - - - - - - - 
 forvalues j = 1/7 {
-gen q24_`j'dist = 1-((abs(10-1) - abs(q24_`j'mean - Q23))/abs(10-1))
+gen q24_dist_150`j' = q24_mean_150`j' - Q23_150`j'
 }
 
 // Drop the variables used for computing the distances - - - - - - - - - - - - -
 drop Q23
-drop *mean
 forvalues j = 1/7 {
 drop q24_`j'
 }
-
-// Rename the generated variables for stacking - - - - - - - - - - - - - - - - -
-local oldnm q24_1dist q24_2dist q24_3dist q24_4dist q24_5dist q24_6dist q24_7dist
-local newnm q24_1501 q24_1502 q24_1503 q24_1504 q24_1505 q24_1506 q24_1507
-
-ren (`oldnm') (`newnm')
 
 
 * Party identification =========================================================
@@ -142,8 +150,10 @@ replace Q25=. if Q25>=1508
 // Generate a set of dichotomous variables from the PID variable - - - - - - - -
 forvalues j = 1501/1507 {
     generate Q25_`j' = Q25
-	replace Q25_`j' = 1 if Q25_`j'==`j' 
-	replace Q25_`j' = 0 if Q25_`j'!=`j' & Q25_`j'!=1
+	generate Q25_stack_`j' = Q25
+	replace Q25_stack_`j' = 1 if Q25_stack_`j'==`j' 
+	replace Q25_stack_`j' = 0 if Q25_stack_`j'!=`j' & Q25_stack_`j'!=1
+	replace Q25_stack_`j' = . if missing(Q25_`j')
 }
 
 
@@ -174,8 +184,10 @@ rename (`oldnm') (`newnm')
 // Generate a set of dichotomous variables from the EP vote choice one - - - - -
 forvalues j = 1501/1507 {
     generate Q7_`j' = Q7
-	replace Q7_`j' = 1 if Q7_`j'==`j' 
-	replace Q7_`j' = 0 if Q7_`j'!=`j' & Q7_`j'!=1
+	generate Q7_stack_`j' = Q7
+	replace Q7_stack_`j' = 1 if Q7_stack_`j'==`j' 
+	replace Q7_stack_`j' = 0 if Q7_stack_`j'!=`j' & Q7_stack_`j'!=1
+	replace Q7_stack_`j' = . if missing(Q7_`j')
 }
 
 
@@ -185,7 +197,6 @@ forvalues j = 1501/1507 {
 replace edu = . if edu > 3
 
 * Create a set of dummy variables for education - - - - - - - - - - - - - - - - 
-
 forvalues i = 1/3 {
 gen edu`i' = edu 
 }
@@ -199,11 +210,10 @@ replace gndr = . if gndr==3
 * age - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
 forvalues j = 1/7 {
-genyhats age_dich_yhat_150`j': age, dep(Q7_150`j') log adjust(no)	
+genyhats age_dich_yhat_150`j': age, dep(Q7_stack_150`j') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
-
 forvalues j = 1/7 {
 genyhats age_cont_yhat_150`j': age, dep(q10_150`j') adjust(no)	
 }
@@ -211,18 +221,16 @@ genyhats age_cont_yhat_150`j': age, dep(q10_150`j') adjust(no)
 * age gender education - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
 forvalues j = 1/7 {
-genyhats socdem_dich_yhat_150`j': age gndr edu1 edu2 edu3, dep(Q7_150`j') log adjust(no)	
+genyhats socdem_dich_yhat_150`j': age gndr edu1 edu2 edu3, dep(Q7_stack_150`j') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
-
 forvalues j = 1/7 {
-genyhats socdem_cont_yhat_150`j': age gndr edu1 edu2 edu3, dep(q10_150`j') adjust(no)	
+genyhats socdem_cont_yhat_150`j': age gndr edu1 edu2 edu3, dep(q10_150`j')  adjust(no)	
 }
 
 
 * drop the education dummy variables - - - - - - - - - - - - - - - - - - - - - -
-
 drop edu1 edu2 edu3
 
 
@@ -230,37 +238,74 @@ drop edu1 edu2 edu3
  
 // 'genstacks' is the 'StackMe' function for stacking the data frame obs.
 * help genstacks
-
-genstacks q10_ Q7_ q13_ q24_ Q25_ /// 
+genstacks q10_ Q11_ q13_mean_ q13_dist_ Q23_ q24_mean_ q24_dist_ ///
+Q25_ Q25_stack_ /// 
+Q7_ Q7_stack_ ///
 age_dich_yhat_ age_cont_yhat_ ///
-socdem_dich_yhat_ socdem_cont_yhat_, rep
+socdem_dich_yhat_ socdem_cont_yhat_, rep 
 
 
-* Mutate the dataset ===========================================================
 
-* Drop and rename some variables - - - - - - - - - - - - - - - - - - - - - - - -
+* Mutate the dataset (in line w/ codebook) =====================================
+
+* Identification variables - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Drop and rename some variables 
 drop genstacks_stack genstacks_nstacks
 ren genstacks_item party
-ren q10_ ptv
-ren Q7_ stacked_votech
-ren q13_ lr_dist
-ren q24_ eu_dist
-ren Q25_ stacked_pid
-ren age_dich_yhat_ age_dich_yhat
-ren age_cont_yhat_ age_cont_yhat
-ren socdem_dich_yhat_ socdem_dich_yhat
-ren socdem_cont_yhat_ socdem_cont_yhat
 
-* Generate a party-voter 'stackid' variable - - - - - - - - - - - - - - - - - - - -
+* Generate a party-voter 'stackid' variable 
 tostring respid, gen(respid2)
 tostring party, gen(party2)
 gen stackid = respid2 + "-" + party2
 drop respid2 party2
 
-* Select the variables to keep and reorder them - - - - - - - - - - - - - - - - 
-keep stackid respid party ptv stacked_votech lr_dist eu_dist stacked_pid age_* /// 
-socdem* age gndr edu
-order stackid respid party ptv stacked_votech lr_dist eu_dist stacked_pid age_* ///
-socdem* age gndr edu
+
+* Voting behavior and Background variables - - - - - - - - - - - - - - - - - - -
+ren Q7_ votech
+ren Q25_ pid
+
+* Voter-Party distance variables - - - - - - - - - - - - - - - - - - - - - - - -
+ren Q11_ lr_self
+ren q13_mean_ lr_party
+ren Q23_ euint_self
+ren q24_mean_ euint_party
+
+* Generic and synthetic variables - - - - - - - - - - - - - - - - - - - - - - - 
+ren q10_ ptv
+ren Q7_stack_ stacked_vc
+ren q13_dist_ lr_dist
+ren q24_dist_ euint_dist
+ren Q25_stack_ stacked_pid
+ren age_dich_yhat_ age_dich_yhat
+ren age_cont_yhat_ age_cont_yhat
+ren socdem_dich_yhat_ socdem_dich_yhat
+ren socdem_cont_yhat_ socdem_cont_yhat
+
+keep respid party stackid ///
+votech pid age gndr edu /// 
+lr_self lr_party ///
+euint_self euint_party ///
+ptv stacked_vc lr_dist euint_dist stacked_pid ///
+lr_dist euint_dist ///
+age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
+
+order respid party stackid ///
+votech pid age gndr edu /// 
+lr_self lr_party ///
+euint_self euint_party ///
+ptv stacked_vc lr_dist euint_dist stacked_pid ///
+lr_dist euint_dist ///
+age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
+
+* Recode all the missing values and save the dataset ===========================
+
+recode age (.=999)
+
+foreach x of varlist * {
+    if substr("`: type `x''",1,3) != "str" {
+        recode `x' (. = 99)
+    }
+ }
 
 
+export delimited using "EES2019_it_stacked_stata.csv",  nolabel replace
