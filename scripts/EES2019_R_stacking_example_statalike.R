@@ -7,7 +7,7 @@
 # Admin # =============================================================================================
 
 # Create a string vector containing the name of the required packages # - - - - - - - - - - - - - - - -
-want = c("tidyverse", "magrittr", "haven", "data.table", "labelled")
+want = c("tidyverse", "magrittr", "haven", "data.table", "labelled", "fs")
 
 # Load the packages if installed, otherwise install and load them # - - - - - - - - - - - - - - - - - -
 have = want %in% rownames(installed.packages())
@@ -21,15 +21,14 @@ options(scipen = 99)
 rm(list = ls())
 
 # Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-if (grepl('StackMat-master', getwd())==F) {
-  setwd(paste0(getwd(), '/StackMat-master/'))
+
+if (grepl('StackMat-master', getwd()) | grepl('StackMat', getwd())) {
+  source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
+} else if (dir.exists(paste0(getwd(), '/Stackmat-master/'))) {
+  setwd(paste0(getwd(), '/Stackmat-master/'))
   source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
 } else {
-  if (grepl('scripts', getwd())==F) {
-    source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
-  } else {
-    source('EES2019_stacking_functions.R')
-  }
+  warning('Set the working directory in the ~/Stackmat or ~/Stackmat-master/ folder')
 }
 
 
@@ -347,9 +346,9 @@ EES2019_it_stacked %<>%
                 euint_self = Q23,
                 euint_party = q24_mean_,
                 ptv = q10_, 
-                stacked_votech = Q7, 
+                stacked_votech = Q7_stack_, 
                 lr_dist = q13_dist_,
-                eu_dist = q24_dist_,
+                euint_dist = q24_dist_,
                 stacked_pid = Q25_stack_,
                 age_cont_yhat = age_cont_yhat_,
                 age_dich_yhat = age_dich_yhat_,
@@ -359,11 +358,11 @@ EES2019_it_stacked %<>%
                 ) %>%
   dplyr::select(respid, party, stackid, votech, pid, age, gndr, edu,
                 lr_self, lr_party, euint_self, euint_party, 
-                ptv, stacked_votech, lr_dist, eu_dist, stacked_pid,
+                ptv, stacked_votech, lr_dist, euint_dist, stacked_pid,
                 age_dich_yhat, age_cont_yhat, socdem_dich_yhat, socdem_cont_yhat)
 
 
 # Save the stacked data frame # =======================================================================
 
-fwrite(EES2019_it_stacked, file=paste0(getwd(), '/data/', 'EES2019_it_stacked.csv'))
+fwrite(EES2019_it_stacked, file=paste0(getwd(), '/data/', 'EES2019_it_stacked_R.csv'), na = 99)
 
