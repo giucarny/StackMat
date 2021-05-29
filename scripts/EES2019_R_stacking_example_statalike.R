@@ -325,28 +325,42 @@ EES2019_it %<>% dplyr::select(-c(edu1, edu2, edu3))
 
 EES2019_it_stacked <- genstacks(data = EES2019_it, 
                                 idvar = 'respid', 
-                                stubs = c('q10', 
-                                          'q13_mean', 'q13_dist', 
-                                          'q24_mean', 'q24_dist', 
+                                stubs = c('q10_',
+                                          'q13_mean_', 'q13_dist_',
+                                          'q24_mean_', 'q24_dist_',
                                           'Q7_stack_', 'Q25_stack_',
-                                          'age_cont_yhat', 'age_dich_yhat', 
-                                          'socdem_dich_yhat', 'socdem_cont_yhat'),
-                                keepvar = c('Q11', 'Q23', 'gndr', 'age', 'Q7'))
+                                          'age_cont_yhat_', 'age_dich_yhat_', 
+                                          'socdem_dich_yhat_', 'socdem_cont_yhat_'),
+                                keepvar = c('Q7', 'Q25', 'Q11','Q23', 'age', 'gndr', 'edu'))
 
 # Mutate the dataset ==================================================================================
 
-# Rename the variables, generate a party-voter 'stackid' variable, keep some variables, and reorder # - - 
+# Rename the variables
 
 EES2019_it_stacked %<>%
-  dplyr::mutate(respid = Var1, 
-                party = Var2, 
-                ptv = q10, 
+  dplyr::mutate(party = stack, 
+                stackid = paste0(respid, "-", party),
+                votech = Q7,
+                pid = Q25, 
+                lr_self = Q11,
+                lr_party = q13_mean_,
+                euint_self = Q23,
+                euint_party = q24_mean_,
+                ptv = q10_, 
                 stacked_votech = Q7, 
-                lr_dist = q13,
-                eu_dist = q24,
+                lr_dist = q13_dist_,
+                eu_dist = q24_dist_,
+                stacked_pid = Q25_stack_,
+                age_cont_yhat = age_cont_yhat_,
+                age_dich_yhat = age_dich_yhat_,
+                socdem_cont_yhat = socdem_cont_yhat_,
+                socdem_dich_yhat = socdem_dich_yhat_,
                 pid = Q25,
-                stackid = paste0(respid, "-", party)) %>%
-  dplyr::select(stackid, respid, party, votech, stacked_votech, ptv, lr_dist, ends_with('yhat'), gndr, age)
+                ) %>%
+  dplyr::select(respid, party, stackid, votech, pid, age, gndr, edu,
+                lr_self, lr_party, euint_self, euint_party, 
+                ptv, stacked_votech, lr_dist, eu_dist, stacked_pid,
+                age_dich_yhat, age_cont_yhat, socdem_dich_yhat, socdem_cont_yhat)
 
 
 # Save the stacked data frame # =======================================================================

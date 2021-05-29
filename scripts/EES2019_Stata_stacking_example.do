@@ -286,7 +286,6 @@ votech pid age gndr edu ///
 lr_self lr_party ///
 euint_self euint_party ///
 ptv stacked_vc lr_dist euint_dist stacked_pid ///
-lr_dist euint_dist ///
 age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
 
 order respid party stackid ///
@@ -294,7 +293,6 @@ votech pid age gndr edu ///
 lr_self lr_party ///
 euint_self euint_party ///
 ptv stacked_vc lr_dist euint_dist stacked_pid ///
-lr_dist euint_dist ///
 age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
 
 * Recode all the missing values and save the dataset ===========================

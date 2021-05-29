@@ -89,12 +89,11 @@ genyhats <- function(data, depvar, regtype, indvar, newname) {
   return(df)
 }
 
-
-# Generate the stacked data matrix - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Function for generating the stacked data matrix - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 genstacks <- function(idvar, data, stubs, keepvar) {
   
-  df <- data %>% dplyr::select(starts_with(paste0(stubs, '_')))
+  df <- data %>% dplyr::select(starts_with(paste0(stubs)))
   
   id1 <- data %>% dplyr::select(all_of(idvar)) %>% unlist()
   id2 <- names(df) %>% gsub('.*\\_', '', ., perl = T) %>% unique %>% as.numeric()
@@ -103,8 +102,8 @@ genstacks <- function(idvar, data, stubs, keepvar) {
   
   for (i in stubs) {
     df2 <- data %>% 
-      dplyr::select(all_of(idvar), starts_with(paste0(i, '_'))) %>%
-      pivot_longer(cols = starts_with(paste0(i, '_')),
+      dplyr::select(all_of(idvar), starts_with(i)) %>%
+      pivot_longer(cols = starts_with(paste0(i)),
                    names_to = paste0(i, '_n'), 
                    values_to = i)
     df2[[paste0(i, '_n')]] %<>% gsub('.*\\_', '', ., perl = T) %>% as.numeric()
@@ -127,12 +126,16 @@ genstacks <- function(idvar, data, stubs, keepvar) {
           df <- data %>% dplyr::select(all_of(idvar), all_of(keepvar))
           names(df)[[1]] <- 'Var1'
           stack_df <- left_join(stack_df, df, by = 'Var1')
+          names(stack_df)[names(stack_df)=='Var1'] <- idvar
+          names(stack_df)[names(stack_df)=='Var2'] <- 'stack'
           return(stack_df)
         } else {
           x <- which(keepvar %in% colnames(EES2019_it))
           df <- data %>% dplyr::select(all_of(idvar), keepvar[c(x)])
           names(df)[[1]] <- 'Var1'
           stack_df <- left_join(stack_df, df, by = 'Var1')
+          names(stack_df)[names(stack_df)=='Var1'] <- idvar
+          names(stack_df)[names(stack_df)=='Var2'] <- 'stack'
           warning("Some elements of 'keepvar' are missing")
           return(stack_df)
         }
@@ -142,3 +145,6 @@ genstacks <- function(idvar, data, stubs, keepvar) {
     }
   }
 }
+
+
+
