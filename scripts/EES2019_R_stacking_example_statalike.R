@@ -71,6 +71,60 @@ names(EES2019_it)[names(EES2019_it)=='EDU'] <- 'edu'
 
 rel_prties <- 1501:1507 %>% as.numeric()
 
+# Party identification # ==============================================================================
+
+# Recode the party identification variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(Q25 = case_when(Q25 >=1508  ~ NA_real_, 
+                                Q25 < 100 ~ NA_real_,
+                                T ~ Q25))  
+
+EES2019_it <- cbind(EES2019_it, 
+                    gendicovar(data = EES2019_it,
+                               indices = 1501:1507, 
+                               stub = 'Q25'))
+
+
+# Dependent variables =================================================================================
+
+# Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>%
+  dplyr::mutate(Q7 = case_when(Q7>=1508 ~ NA_real_, 
+                               Q7<100 ~ NA_real_,
+                               T ~ Q7))
+
+# Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(across(starts_with('q10_'), ~case_when(.>10 ~ NA_real_, 
+                                                       T ~ .)))
+
+# Rescale the PTV variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(across(starts_with('q10_'), ~./10))
+
+# Drop the empty PTV variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it %<>% dplyr::select(-c(paste0('q10_', seq(8,10,1))))
+
+# Rename the PTV variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+names(EES2019_it)[startsWith(colnames(EES2019_it), 'q10_')] <- paste0('q10_', seq(1501, 1507, 1))
+
+
+# Generate a set of dichotomous variables from the EP vote choice one - - - - - - - - - - - - - - - -
+
+EES2019_it <- cbind(EES2019_it, 
+                    gendicovar(data = EES2019_it,
+                               indices = 1501:1507, 
+                               stub = 'Q7'))
+
+rm(list=ls(pattern='df'))
+
+
 # LR distance # =======================================================================================
 
 # Drop variable related to non-relevant parties - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -173,60 +227,6 @@ EES2019_it %<>%
 # Rename the generated variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q24_', 'dist_', seq(1501, 1507, 1))
-
-
-# Party identification # ==============================================================================
-
-# Recode the party identification variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-EES2019_it %<>% 
-  dplyr::mutate(Q25 = case_when(Q25 >=1508  ~ NA_real_, 
-                                Q25 < 100 ~ NA_real_,
-                                T ~ Q25))  
-
-EES2019_it <- cbind(EES2019_it, 
-                    gendicovar(data = EES2019_it,
-                               indices = 1501:1507, 
-                               stub = 'Q25'))
-
-
-# Dependent variables =================================================================================
-
-# Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-EES2019_it %<>%
-  dplyr::mutate(Q7 = case_when(Q7>=1508 ~ NA_real_, 
-                               Q7<100 ~ NA_real_,
-                               T ~ Q7))
-
-# Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-EES2019_it %<>% 
-  dplyr::mutate(across(starts_with('q10_'), ~case_when(.>10 ~ NA_real_, 
-                                                       T ~ .)))
-
-# Rescale the PTV variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-EES2019_it %<>% 
-  dplyr::mutate(across(starts_with('q10_'), ~./10))
-
-# Drop the empty PTV variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-EES2019_it %<>% dplyr::select(-c(paste0('q10_', seq(8,10,1))))
-
-# Rename the PTV variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-names(EES2019_it)[startsWith(colnames(EES2019_it), 'q10_')] <- paste0('q10_', seq(1501, 1507, 1))
-
-
-# Generate a set of dichotomous variables from the EP vote choice one - - - - - - - - - - - - - - - -
-
-EES2019_it <- cbind(EES2019_it, 
-                    gendicovar(data = EES2019_it,
-                               indices = 1501:1507, 
-                               stub = 'Q7'))
-
-rm(list=ls(pattern='df'))
 
 
 # Sociodemographic yhats ==============================================================================

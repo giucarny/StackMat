@@ -60,87 +60,6 @@ ren EDU edu
 
 * relevant parties: 1501 1502 1503 1504 1505 1506 1507
 
-
-* LR distance ==================================================================
-
-// Drop variable related to non-relevant parties - - - - - - - - - - - - - - - -
-drop q13_8 q13_9
-
-// Recode missing values - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-replace Q11=. if Q11>10
-
-forvalues j = 1/7 {
-replace q13_`j'=. if q13_`j'>10 
-}
-
-// Generate a rescaled stacked version of the original individual variable - - -
-forvalues j = 1501/1507 {
-gen Q11_`j'=Q11/10
-}
-
-// Rescale individual perceptions of party positions - - - - - - - - - - - - - -
-forvalues i = 1/7 {
-    replace q13_`i' = q13_`i'/10	
-}
-
-// Generate mean values of party positions - - - - - - - - - - - - - - - - - - -
-forvalues i = 1/7 {
-egen q13_mean_150`i' = mean(q13_`i')	
-}
-
-// Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - -
-forvalues j = 1/7 {
-gen q13_dist_150`j' = abs(q13_mean_150`j' - Q11_150`j')
-}
-
-// Drop the variables used for computing the distances - - - - - - - - - - - - -
-drop Q11
-forvalues j = 1/7 {
-drop q13_`j'
-}
-
-
-
-* EU integration distances =====================================================
-
-// Drop variable related to non-relevant parties - - - - - - - - - - - - - - - -
-drop q24_8 q24_9
-
-// Recode missing values - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-replace Q23=. if Q23>10
-
-forvalues j = 1/7 {
-replace q24_`j'=. if q24_`j'>10 
-}
-
-// Generate a rescaled stacked version of the original individual variable - - -
-forvalues j = 1501/1507 {
-gen Q23_`j'=Q23/10
-}
-
-// Rescale individual perceptions of party positions - - - - - - - - - - - - - -
-forvalues i = 1/7 {
-    replace q24_`i' = q24_`i'/10	
-}
-
-
-// Generate mean values of party positions on EU integration - - - - - - - - - -
-forvalues i = 1/7 {
-egen q24_mean_150`i' = mean(q24_`i')	
-}
-
-// Generate EU integration distance variables - - - - - - - - - - - - - - - - - 
-forvalues j = 1/7 {
-gen q24_dist_150`j' = abs(q24_mean_150`j' - Q23_150`j')
-}
-
-// Drop the variables used for computing the distances - - - - - - - - - - - - -
-drop Q23
-forvalues j = 1/7 {
-drop q24_`j'
-}
-
-
 * Party identification =========================================================
 
 // Recode the party identification variable - - - - - - - - - - - - - - - - - - 
@@ -149,11 +68,10 @@ replace Q25=. if Q25>=1508
 
 // Generate a set of dichotomous variables from the PID variable - - - - - - - -
 forvalues j = 1501/1507 {
-    generate Q25_`j' = Q25
 	generate Q25_stack_`j' = Q25
 	replace Q25_stack_`j' = 1 if Q25_stack_`j'==`j' 
 	replace Q25_stack_`j' = 0 if Q25_stack_`j'!=`j' & Q25_stack_`j'!=1
-	replace Q25_stack_`j' = . if missing(Q25_`j')
+	replace Q25_stack_`j' = . if missing(Q25)
 }
 
 
@@ -190,6 +108,76 @@ forvalues j = 1501/1507 {
 	replace Q7_stack_`j' = . if missing(Q7_`j')
 }
 
+* LR distance ==================================================================
+
+// Drop variable related to non-relevant parties - - - - - - - - - - - - - - - -
+drop q13_8 q13_9
+
+// Recode missing values and rescale LR self placement - - - - - - - - - - - - -
+replace Q11=. if Q11>10
+
+forvalues j = 1/7 {
+replace q13_`j'=. if q13_`j'>10 
+}
+
+replace Q11 = Q11/10
+
+// Rescale individual perceptions of party positions - - - - - - - - - - - - - -
+forvalues i = 1/7 {
+    replace q13_`i' = q13_`i'/10	
+}
+
+// Generate mean values of party positions - - - - - - - - - - - - - - - - - - -
+forvalues i = 1/7 {
+egen q13_mean_150`i' = mean(q13_`i')	
+}
+
+. // Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - -
+forvalues j = 1/7 {
+    gen q13_dist_150`j' = abs(q13_mean_150`j' - Q11)
+}
+
+// Drop the variables used for computing the distances - - - - - - - - - - - - -
+forvalues j = 1/7 {
+drop q13_`j'
+}
+
+
+
+* EU integration distances =====================================================
+
+// Drop variable related to non-relevant parties - - - - - - - - - - - - - - - -
+drop q24_8 q24_9
+
+// Recode missing values - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+replace Q23=. if Q23>10
+
+forvalues j = 1/7 {
+replace q24_`j'=. if q24_`j'>10 
+}
+
+replace Q23 = Q23/10
+
+// Rescale individual perceptions of party positions - - - - - - - - - - - - - -
+forvalues i = 1/7 {
+    replace q24_`i' = q24_`i'/10	
+}
+
+
+// Generate mean values of party positions on EU integration - - - - - - - - - -
+forvalues i = 1/7 {
+egen q24_mean_150`i' = mean(q24_`i')	
+}
+
+// Generate EU integration distance variables - - - - - - - - - - - - - - - - - 
+forvalues j = 1/7 {
+gen q24_dist_150`j' = abs(q24_mean_150`j' - Q23)
+}
+
+// Drop the variables used for computing the distances - - - - - - - - - - - - -
+forvalues j = 1/7 {
+drop q24_`j'
+}
 
 * Sociodemographic yhats =======================================================
 
@@ -238,8 +226,8 @@ drop edu1 edu2 edu3
  
 // 'genstacks' is the 'StackMe' function for stacking the data frame obs.
 * help genstacks
-genstacks q10_ Q11_ q13_mean_ q13_dist_ Q23_ q24_mean_ q24_dist_ ///
-Q25_ Q25_stack_ /// 
+genstacks q10_ q13_mean_ q13_dist_ q24_mean_ q24_dist_ ///
+Q25_stack_ /// 
 Q7_ Q7_stack_ ///
 age_dich_yhat_ age_cont_yhat_ ///
 socdem_dich_yhat_ socdem_cont_yhat_, rep 
@@ -262,12 +250,12 @@ drop respid2 party2
 
 * Voting behavior and Background variables - - - - - - - - - - - - - - - - - - -
 ren Q7_ votech
-ren Q25_ pid
+ren Q25 pid
 
 * Voter-Party distance variables - - - - - - - - - - - - - - - - - - - - - - - -
-ren Q11_ lr_self
+ren Q11 lr_self
 ren q13_mean_ lr_party
-ren Q23_ euint_self
+ren Q23 euint_self
 ren q24_mean_ euint_party
 
 * Generic and synthetic variables - - - - - - - - - - - - - - - - - - - - - - - 
