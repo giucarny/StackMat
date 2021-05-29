@@ -1,13 +1,13 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Title: Script for Stacking Data (EES 2019 Voter Study, Italian Sample) 
 # Author: G.Carteny
-# last update: 2021-05-25
+# last update: 2021-05-27
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Admin # =============================================================================================
 
 # Create a string vector containing the name of the required packages # - - - - - - - - - - - - - - - -
-want = c("tidyverse", "magrittr", "haven", "data.table", "labelled")
+want = c("tidyverse", "magrittr", "haven", "data.table", "labelled", "fs")
 
 # Load the packages if installed, otherwise install and load them # - - - - - - - - - - - - - - - - - -
 have = want %in% rownames(installed.packages())
@@ -20,16 +20,23 @@ options(scipen = 99)
 # Remove all the objects from the environment # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rm(list = ls())
 
-# Set the working directory # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-setwd(paste0(getwd(), '/StackMat-master/'))
+if (grepl('StackMat-master', getwd()) | grepl('StackMat', getwd())) {
+  source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
+} else if (dir.exists(paste0(getwd(), '/Stackmat-master/'))) {
+  setwd(paste0(getwd(), '/Stackmat-master/'))
+  source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
+} else {
+  warning('Set the working directory in the ~/Stackmat or ~/Stackmat-master/ folder')
+}
 
 
 # Load data # =========================================================================================
 
 # Load the EES 2019 voter study dataset (Stata version) # - - - - - - - - - - - - - - - - - - - - - - -
-EES2019 <- haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta'))
-
+EES2019 <- 
+  haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta')) 
 
 # Load an auxiliary data frame, containing party id variables (EES, CHES, CMP), vote shares (for first 
 # and second order elections),... # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,6 +68,8 @@ EES2019 %<>%
   dplyr::mutate(age = year-D4_1) %>% # (2) Create an 'age' variable, substracting the birth year from the survey year 
   dplyr::filter(age>17)              # (3) Remove respondents younger than 18yrs
 
+EES2019 %<>%
+  haven::zap_labels(.)
 
 
 # Select country-specific data frames for stacking # ==================================================
