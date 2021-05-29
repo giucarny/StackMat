@@ -99,28 +99,29 @@ EES2019_it %<>%
 # Generate mean values of party positions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
-  mutate(across(starts_with('q13'), list(mean = ~mean(., na.rm=T))))
+  dplyr::mutate(across(starts_with('q13'), list(mean = ~mean(., na.rm=T))))
+
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'mean')] <- paste0('q13_', 'mean_', seq(1501, 1507, 1))
 
 
 # Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 EES2019_it <- cbind(EES2019_it,
                     gendist(data = EES2019_it, 
-                            indices = 1:7, 
-                            stub = 'q13'))
+                            indices = 1501:1507, 
+                            stub1 = 'Q11',
+                            stub2 = 'q13_mean_'))
 
 
 # Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
-  dplyr::select(-c(#Q11, 
-                   #ends_with('mean'),
-                   paste0('q13_', seq(1,7,1))))
+  dplyr::select(-c(paste0('q13_', seq(1,7,1))))
 
 
 # Rename the generated variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q13_', seq(1501, 1507, 1))
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q13_', 'dist_', seq(1501, 1507, 1))
 
 
 # EU integration distance # ===========================================================================
@@ -141,38 +142,38 @@ EES2019_it %<>%
                                                       T ~ .)))
 
 
-
 # Generate rescaled versions of the original individual variables - - - - - - - - - - - - - - - - - - -
 
 EES2019_it %<>%
   dplyr::mutate(Q23 = Q23/10) %>%
   dplyr::mutate(across(starts_with('q24'), ~./10))
 
-# Generate mean values of party positions on EU integration - - - - - - - - - - - - - - - - - - - - - -
+# Generate mean values of party positions - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
-  mutate(across(starts_with('q24'), list(mean = ~mean(., na.rm=T))))
+  dplyr::mutate(across(starts_with('q24'), list(mean = ~mean(., na.rm=T))))
+
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'mean')] <- paste0('q24_', 'mean_', seq(1501, 1507, 1))
 
 
 # Generate EU integration distance variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it <- cbind(EES2019_it,
                     gendist(data = EES2019_it, 
-                            indices = 1:7, 
-                            stub = 'q24'))
+                            indices = 1501:1507, 
+                            stub1 = 'Q23',
+                            stub2 = 'q24_mean_'))
 
 
 # Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
-  dplyr::select(-c(#Q23, 
-                   #ends_with('mean'),
-                   paste0('q24_', seq(1,7,1))))
+  dplyr::select(-c(paste0('q24_', seq(1,7,1))))
 
 
 # Rename the generated variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q24_', seq(1501, 1507, 1))
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q24_', 'dist_', seq(1501, 1507, 1))
 
 
 # Party identification # ==============================================================================

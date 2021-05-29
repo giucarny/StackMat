@@ -6,16 +6,17 @@
 
 # Functions for generating party-voter distances - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-gendist.int.fun <- function(data, index, basevar){
-  exprss <- paste0('abs(', basevar, '_', index, '-', basevar, '_', index, '_mean', ')')
-  newvar <- paste0(basevar, '_', index, "dist")
+
+gendist.int.fun <- function(data, index, var1, var2){
+  exprss <- paste0('abs(', var1, '-', var2, index, ')')
+  newvar <- paste0(var2, index, "dist")
   q <- quote(mutate(data, !! newvar := exprss))
   df2 <- eval(parse(text=sub("exprss", exprss, deparse(q)))) %>% dplyr::select(all_of(newvar))
   return(df2)
 }
 
-gendist <- function(data, indices, stub) {
-  df <- lapply(data=data, X = indices, basevar = stub, FUN = gendist.int.fun) %>% do.call('cbind',.)  
+gendist <- function(data, indices, stub1, stub2) {
+  df <- lapply(data=data, X = indices, var1 = stub1, var2 = stub2, FUN = gendist.int.fun) %>% do.call('cbind',.)  
   return(df)
 }
 

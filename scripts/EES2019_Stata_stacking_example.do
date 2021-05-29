@@ -131,7 +131,7 @@ egen q24_mean_150`i' = mean(q24_`i')
 
 // Generate EU integration distance variables - - - - - - - - - - - - - - - - - 
 forvalues j = 1/7 {
-gen q24_dist_150`j' = q24_mean_150`j' - Q23_150`j'
+gen q24_dist_150`j' = abs(q24_mean_150`j' - Q23_150`j')
 }
 
 // Drop the variables used for computing the distances - - - - - - - - - - - - -
