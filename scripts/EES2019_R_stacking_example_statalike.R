@@ -261,7 +261,7 @@ EES2019_it %<>%
 # Age yhats - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Generate yhats for a dichotomous dependent variable
 
-depvars <- paste0('Q7_', rel_prties)
+depvars <- paste0('Q7_stack_', rel_prties)
 
 for(i in depvars) {
   EES2019_it <- genyhats(data=EES2019_it, 
@@ -289,7 +289,7 @@ rm(i, depvars)
 # Age gender education yhats - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Generate yhats for a dichotomous dependent variable
 
-depvars <- paste0('Q7_', rel_prties)
+depvars <- paste0('Q7_stack_', rel_prties)
 
 for(i in depvars) {
   EES2019_it <- genyhats(data=EES2019_it, 
@@ -321,14 +321,17 @@ EES2019_it %<>% dplyr::select(-c(edu1, edu2, edu3))
 
 # Stack the observations ==============================================================================
 
-names(EES2019_it)[names(EES2019_it)=="Q7"] <- 'votech'
+# names(EES2019_it)[names(EES2019_it)=="Q7"] <- 'votech'
 
 EES2019_it_stacked <- genstacks(data = EES2019_it, 
                                 idvar = 'respid', 
-                                stubs = c('q10', 'q13', 'q24', 'Q7', 'Q25',
+                                stubs = c('q10', 
+                                          'q13_mean', 'q13_dist', 
+                                          'q24_mean', 'q24_dist', 
+                                          'Q7_stack_', 'Q25_stack_',
                                           'age_cont_yhat', 'age_dich_yhat', 
                                           'socdem_dich_yhat', 'socdem_cont_yhat'),
-                                keepvar = c('gndr', 'age', 'votech'))
+                                keepvar = c('Q11', 'Q23', 'gndr', 'age', 'Q7'))
 
 # Mutate the dataset ==================================================================================
 

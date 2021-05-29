@@ -82,7 +82,7 @@ genyhats <- function(data, depvar, regtype, indvar, newname) {
 
   outcomedf %<>% dplyr::select(respid, yhat)
 
-  names(outcomedf)[names(outcomedf)=='yhat'] <- paste0(newname, '_yhat_', depvar)
+  names(outcomedf)[names(outcomedf)=='yhat'] <- paste0(newname, '_yhat_', gsub(pattern = '.*\\_', '', depvar))
 
   df <- left_join(data, outcomedf, by='respid')
   
