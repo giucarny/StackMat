@@ -32,6 +32,9 @@ cd "C:\Users\giuse\Documents\GIT\StackMat\data"
 * Load data ====================================================================
 
 use "ZA7581_v1-0-0.dta", clear
+//use "EES_CHES_2019_aux.dta", clear
+
+merge 1:m respid countrycode Q7 using EES_CHES_2019_aux
 
 
 * Select country-specific data frames for stacking =============================
@@ -39,9 +42,13 @@ use "ZA7581_v1-0-0.dta", clear
 keep if countrycode==1380 // EES2019 Italian voter study
 
 
+* Merge with auxiliary dataset (w/ CHES party-specific scores & other vars) ====
+
+
 * Select the relevant variables ================================================
 
-keep respid Q7 q10* Q11 q13* D3 D4_1 Q23 q24* Q25 Q26 EDU
+keep respid countrycode Q7 q10* Q11 q13* D3 D4_1 Q23 q24* Q25 Q26 EDU ///
+lrgen eu_position
 
 
 * Create additional variables ==================================================
@@ -134,6 +141,7 @@ replace q13_`j'=. if q13_`j'>10
 
 replace Q11 = Q11/10
 
+
 // Rescale individual perceptions of party positions - - - - - - - - - - - - - -
 forvalues i = 1/7 {
     replace q13_`i' = q13_`i'/10	
@@ -144,9 +152,23 @@ forvalues i = 1/7 {
 egen q13_mean_150`i' = mean(q13_`i')	
 }
 
-. // Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - -
+// Generate mean values of party positions for ches var - - - - - - - - - - - - 
+forvalues i = 1/7 {
+gen lrgen2_stack_150`i' = lrgen if Q7==150`i'	
+egen lrgen_stack_150`i' = mean(lrgen2_stack_150`i')
+drop lrgen2_stack_150`i'
+}
+
+drop lrgen
+
+// Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - -
 forvalues j = 1/7 {
     gen q13_dist_150`j' = abs(q13_mean_150`j' - Q11)
+}
+
+// Generate LR distance variables w/ ches var - - - - - - - - - - - - - - - - - 
+forvalues j = 1/7 {
+    gen lrgen_dist_150`j' = abs(lrgen_stack_150`j' - Q11)
 }
 
 // Drop the variables used for computing the distances - - - - - - - - - - - - -
@@ -163,6 +185,7 @@ drop q24_8 q24_9
 
 // Recode missing values - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 replace Q23=. if Q23>10
+
 
 forvalues j = 1/7 {
 replace q24_`j'=. if q24_`j'>10 
@@ -181,9 +204,24 @@ forvalues i = 1/7 {
 egen q24_mean_150`i' = mean(q24_`i')	
 }
 
+// Generate mean values of party positions for ches var - - - - - - - - - - - - 
+forvalues i = 1/7 {
+gen eu_position2_stack_150`i' = eu_position if Q7==150`i'	
+egen eu_position_stack_150`i' = mean(eu_position2_stack_150`i')
+drop eu_position2_stack_150`i'
+}
+
+drop eu_position
+
+
 // Generate EU integration distance variables - - - - - - - - - - - - - - - - - 
 forvalues j = 1/7 {
 gen q24_dist_150`j' = abs(q24_mean_150`j' - Q23)
+}
+
+// Generate EU integration distance variables w/ ches var - - - - - - - - - - - 
+forvalues j = 1/7 {
+    gen eu_position_dist_150`j' = abs(eu_position_stack_150`j' - Q23)
 }
 
 // Drop the variables used for computing the distances - - - - - - - - - - - - -
@@ -239,6 +277,7 @@ drop edu1 edu2 edu3
 // 'genstacks' is the 'StackMe' function for stacking the data frame obs.
 * help genstacks
 genstacks q10_ q13_mean_ q13_dist_ q24_mean_ q24_dist_ ///
+lrgen_stack_ lrgen_dist_ eu_position_stack_ eu_position_dist_ ///
 Q25_stack_ Q26_stack_ /// 
 Q7_ Q7_stack_ ///
 age_dich_yhat_ age_cont_yhat_ ///
@@ -270,12 +309,16 @@ ren Q11 lr_self
 ren q13_mean_ lr_party
 ren Q23 euint_self
 ren q24_mean_ euint_party
+ren lrgen_stack_ lr_party_ches
+ren eu_position_stack_ euint_party_ches
 
 * Generic and synthetic variables - - - - - - - - - - - - - - - - - - - - - - - 
 ren q10_ ptv
 ren Q7_stack_ stacked_vc
 ren q13_dist_ lr_dist
+ren lrgen_dist_ lr_dist_ches
 ren q24_dist_ euint_dist
+ren eu_position_dist euint_dist_ches
 ren Q25_stack_ stacked_pid
 ren Q26_stack_ stacked_pid_str
 ren age_dich_yhat_ age_dich_yhat
@@ -285,16 +328,17 @@ ren socdem_cont_yhat_ socdem_cont_yhat
 
 keep respid party stackid ///
 votech pid pid_str age gndr edu /// 
-lr_self lr_party ///
-euint_self euint_party ///
-ptv stacked_vc lr_dist euint_dist stacked_pid stacked_pid_str ///
+lr_self lr_party lr_party_ches ///
+euint_self euint_party euint_party_ches ///
+ptv stacked_vc lr_dist euint_dist lr_dist_ches euint_dist_ches ///
+stacked_pid stacked_pid_str ///
 age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
 
 order respid party stackid ///
 votech pid pid_str age gndr edu /// 
-lr_self lr_party ///
-euint_self euint_party ///
-ptv stacked_vc lr_dist euint_dist stacked_pid stacked_pid_str ///
+lr_self lr_party lr_party_ches ///
+euint_self euint_party euint_party_ches ///
+ptv stacked_vc lr_dist lr_dist_ches euint_dist euint_dist_ches stacked_pid stacked_pid_str ///
 age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
 
 * Recode all the missing values and save the dataset ===========================

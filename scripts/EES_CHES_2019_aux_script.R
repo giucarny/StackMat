@@ -104,6 +104,6 @@ rm(list=ls(pattern='contxt_vars'))
 
 # Save the data frame # =============================================================================
 
-haven::write_dta(data = EES2019, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")), version=15)
+haven::write_dta(data = EES2019, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")))
 
 rm(list=ls(pattern="CHES|aux"))

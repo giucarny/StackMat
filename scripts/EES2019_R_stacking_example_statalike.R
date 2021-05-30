@@ -40,6 +40,17 @@ EES2019 <-
   haven::zap_labels(.)
 
 
+# Load an auxiliary dataset (CHES) # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_aux <- 
+  haven::read_dta(paste0(getwd(), '/data/' ,'EES_CHES_2019_aux.dta')) %>%
+  haven::zap_labels(.)
+
+
+# Join the datasets by 'respid', 'countrycode', and 'Q7'
+
+EES2019 <- left_join(EES2019, EES2019_aux)
+
 # Select country-specific data frames for stacking # ==================================================
 
 EES2019_it <- EES2019 %>% dplyr::filter(countrycode==1380) # EES2019 Italian voter study
@@ -52,7 +63,8 @@ EES2019_it %<>% dplyr::select(respid, D3, D4_1, EDU,
                               Q7, starts_with('q10'), 
                               Q11, starts_with('q13'),  
                               Q23, starts_with('q24'), 
-                              Q25, Q26)
+                              Q25, Q26,
+                              lrgen, eu_position)
 
 
 # Create additional variables # =======================================================================
@@ -174,6 +186,19 @@ EES2019_it %<>%
 names(EES2019_it)[endsWith(colnames(EES2019_it), 'mean')] <- paste0('q13_', 'mean_', seq(1501, 1507, 1))
 
 
+# Generate mean values of party positions based on ches var # - - - - - - - - - - - - - - - - - - - -
+
+lrgen_df <- 
+  genstackedvar(EES2019_it, indices = 1501:1507, stub1 = 'lrgen', stub2 = 'Q7') %>%
+  as_tibble() %>%
+  mutate(across(names(.), ~case_when(.==0 ~ NA_real_, T~.))) %>%
+  mutate(across(names(.), ~mean(., na.rm = T))) 
+
+EES2019_it <- cbind(EES2019_it, lrgen_df)
+
+rm(lrgen_df)
+
+
 # Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 EES2019_it <- cbind(EES2019_it,
@@ -182,16 +207,24 @@ EES2019_it <- cbind(EES2019_it,
                             stub1 = 'Q11',
                             stub2 = 'q13_mean_'))
 
+# Rename the generated variables for stacking 
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q13_', 'dist_', seq(1501, 1507, 1))
+
+EES2019_it <- cbind(EES2019_it,
+                    gendist(data = EES2019_it, 
+                            indices = 1501:1507, 
+                            stub1 = 'Q11',
+                            stub2 = 'lrgen_stack_'))
+
+# Rename the generated variables for stacking 
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('lrgen_', 'dist_', seq(1501, 1507, 1))
+
 
 # Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
   dplyr::select(-c(paste0('q13_', seq(1,7,1))))
 
-
-# Rename the generated variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q13_', 'dist_', seq(1501, 1507, 1))
 
 
 # EU integration distance # ===========================================================================
@@ -225,6 +258,18 @@ EES2019_it %<>%
 
 names(EES2019_it)[endsWith(colnames(EES2019_it), 'mean')] <- paste0('q24_', 'mean_', seq(1501, 1507, 1))
 
+# Generate mean values of party positions based on ches var # - - - - - - - - - - - - - - - - - - - -
+
+eu_position_df <- 
+  genstackedvar(EES2019_it, indices = 1501:1507, stub1 = 'eu_position', stub2 = 'Q7') %>%
+  as_tibble() %>%
+  mutate(across(names(.), ~case_when(.==0 ~ NA_real_, T~.))) %>%
+  mutate(across(names(.), ~mean(., na.rm = T))) 
+
+EES2019_it <- cbind(EES2019_it, eu_position_df)
+
+rm(eu_position_df)
+
 
 # Generate EU integration distance variables - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -234,16 +279,24 @@ EES2019_it <- cbind(EES2019_it,
                             stub1 = 'Q23',
                             stub2 = 'q24_mean_'))
 
+# Rename the generated variables for stacking
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q24_', 'dist_', seq(1501, 1507, 1))
+
+
+EES2019_it <- cbind(EES2019_it,
+                    gendist(data = EES2019_it, 
+                            indices = 1501:1507, 
+                            stub1 = 'Q23',
+                            stub2 = 'eu_position_stack_'))
+
+# Rename the generated variables for stacking
+names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('eu_position_', 'dist_', seq(1501, 1507, 1))
+
 
 # Drop the variables used for computing the distances - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>%
   dplyr::select(-c(paste0('q24_', seq(1,7,1))))
-
-
-# Rename the generated variables for stacking - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-names(EES2019_it)[endsWith(colnames(EES2019_it), 'dist')] <- paste0('q24_', 'dist_', seq(1501, 1507, 1))
 
 
 # Sociodemographic yhats ==============================================================================
@@ -343,7 +396,9 @@ EES2019_it_stacked <- genstacks(data = EES2019_it,
                                 idvar = 'respid', 
                                 stubs = c('q10_',
                                           'q13_mean_', 'q13_dist_',
+                                          'lrgen_stack_', 'lrgen_dist_',
                                           'q24_mean_', 'q24_dist_',
+                                          'eu_position_stack_', 'eu_position_dist_',
                                           'Q7_stack_', 'Q25_stack_', 'Q26_stack_',
                                           'age_cont_yhat_', 'age_dich_yhat_', 
                                           'socdem_dich_yhat_', 'socdem_cont_yhat_'),
@@ -361,12 +416,16 @@ EES2019_it_stacked %<>%
                 pid_str = Q26,
                 lr_self = Q11,
                 lr_party = q13_mean_,
+                lr_party_ches = lrgen_stack_,
                 euint_self = Q23,
                 euint_party = q24_mean_,
+                euint_party_ches = eu_position_stack_,
                 ptv = q10_, 
                 stacked_votech = Q7_stack_, 
                 lr_dist = q13_dist_,
+                lr_dist_ches = lrgen_dist_,
                 euint_dist = q24_dist_,
+                euint_dist_ches = eu_position_dist_,
                 stacked_pid = Q25_stack_,
                 stacked_pid_str = Q26_stack_,
                 age_cont_yhat = age_cont_yhat_,
@@ -376,7 +435,7 @@ EES2019_it_stacked %<>%
                 pid = Q25,
                 ) %>%
   dplyr::select(respid, party, stackid, votech, pid, pid_str, age, gndr, edu,
-                lr_self, lr_party, euint_self, euint_party, 
+                lr_self, lr_party, lr_party_ches, euint_self, euint_party, euint_party_ches, 
                 ptv, stacked_votech, lr_dist, euint_dist, stacked_pid, stacked_pid_str,
                 age_dich_yhat, age_cont_yhat, socdem_dich_yhat, socdem_cont_yhat)
 
