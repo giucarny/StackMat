@@ -82,18 +82,20 @@ EES2019 %<>%
 # Select the auxiliary dataframe relevant variables # - - - - - - - - - - - - - - - - - - - - - - - -
 
 EES2019_aux %<>%
-  dplyr::select(countrycode, Q7, party_id)
-
+  dplyr::select(countrycode, Q7, party_id) %>%
+  na.omit() %>%
+  distinct()
 
 # Join the dataframes # =============================================================================
 
-EES2019 <- left_join(EES2019, EES2019_aux)
+EES2019_b <- left_join(EES2019, EES2019_aux)
 
-EES2019 <- left_join(EES2019, CHES2019)
+EES2019_ches <- left_join(EES2019_b, CHES2019)
+rm(EES2019_b)
 
 # Re-select and rescale relevant variables # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-EES2019 %<>% 
+EES2019_ches %<>% 
   dplyr::select(respid, countrycode, Q7, all_of(contxt_vars)) %>%
   zap_labels(.) %>%
   dplyr::mutate(across(all_of(contxt_vars), ~./10))
@@ -104,13 +106,13 @@ rm(list=ls(pattern='contxt_vars'))
 
 # Save the data frame # =============================================================================
 
-haven::write_dta(data = EES2019, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")))
+haven::write_dta(data = EES2019_ches, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")))
 
 rm(list=ls(pattern="CHES|aux"))
 
 # EES codebook for PID recoding # =====================================================================
 
-EES_codebook <- 
+EES_Q25 <- 
   data.table::fread(paste0(getwd(), '/data/' ,'ZA7581_cp.csv')) %>%
   haven::zap_labels(.) %>%
   dplyr::mutate(Q25 = q25, 
@@ -122,9 +124,21 @@ EES_codebook <-
   dplyr::select(countrycode, Q25, Q25_rec) %>%
   dplyr::mutate(across(names(.), ~as.numeric(.)))
 
+# Reload the EES 2019 voter study dataset # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+EES2019 <- 
+  haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta')) %>%
+  dplyr::select(respid, countrycode, Q25) %>%
+  dplyr::mutate(across(names(.), ~as.numeric(.)))
+
+EES_Q25 <- left_join(EES2019, EES_Q25) 
+
+# %>%
+#  mutate(Q25 = Q25_rec) %>%
+#  dplyr::select(-c(Q25_rec))
+
 
 # Save the data frame # =============================================================================
 
-haven::write_dta(data = EES_codebook, path(paste0(getwd(), '/data/' ,"EES_2019_Q25_aux.dta")))
+haven::write_dta(data = EES_Q25, path(paste0(getwd(), '/data/' ,"EES_2019_Q25_aux.dta")))
 
-rm(list=ls(pattern="CHES|aux"))
+rm(list=ls(pattern="EES"))

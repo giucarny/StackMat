@@ -34,16 +34,26 @@ cd "C:\Users\giuse\Documents\GIT\StackMat\data"
 use "ZA7581_v1-0-0.dta", clear
 //use "EES_CHES_2019_aux.dta", clear
 
+* Merge with auxiliary dataset (w/ CHES party-specific scores & other vars) ====
+
+
 merge 1:m respid countrycode Q7 using EES_CHES_2019_aux
+drop _merge
+
+merge 1:m respid countrycode Q25 using EES_2019_Q25_aux
+drop _merge
+
+drop Q25
+ren Q25_rec Q25
+
+foreach var of varlist _all {
+	label var `var' ""
+}
 
 
 * Select country-specific data frames for stacking =============================
 
 keep if countrycode==1380 // EES2019 Italian voter study
-
-
-* Merge with auxiliary dataset (w/ CHES party-specific scores & other vars) ====
-
 
 * Select the relevant variables ================================================
 
@@ -69,6 +79,11 @@ ren EDU edu
 
 * Party identification =========================================================
 
+// recode the party identification variable (Q25) to make party codes parallel 
+// with the party choice variable (Q7)
+
+
+
 // Recode the party identification variable - - - - - - - - - - - - - - - - - - 
 replace Q25=. if Q25<100 
 replace Q25=. if Q25>=1508
@@ -93,6 +108,7 @@ forvalues i = 1501/1507 {
 	replace Q26_stack_`i'=0 if missing(Q26_stack_`i')
 }
 
+replace Q26=. if missing(Q25)
 
 * Dependent variables ==========================================================
 
