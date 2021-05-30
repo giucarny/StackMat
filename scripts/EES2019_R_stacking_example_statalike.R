@@ -51,32 +51,28 @@ EES2019_aux <-
   haven::zap_labels(.)
 
 
-# Join the datasets by 'respid', 'countrycode', and 'Q7'
+# Join the datasets by 'respid', 'countrycode', and 'Q7' # - - - - - - - - - - - - - - - - - - - - - -
 
 EES2019 <- left_join(EES2019, EES2019_aux)
 rm(EES2019_aux)
 
-# Load a second auxiliary dataset (EES codebook) # - - - - - - - - - - - - - - - - - - - - - - - - - -
-EES_codebook <- 
-  data.table::fread(paste0(getwd(), '/data/' ,'ZA7581_cp.csv')) %>%
-  haven::zap_labels(.) %>%
-  dplyr::mutate(Q25 = q25, 
-                Q25_rec = Q7,
-                Q10_PTV = case_when(Q10_PTV=='' ~ NA_character_,
-                                    T ~ Q10_PTV)) %>% 
-  dplyr::select(countrycode, Q10_PTV, Q25, Q25_rec) %>%
-  na.omit() %>% 
-  dplyr::select(countrycode, Q25, Q25_rec) %>%
-  dplyr::mutate(across(names(.), ~as.numeric(.)))
+# Load a second auxiliary dataset (from EES codebook) # - - - - - - - - - - - - - - - - - - - - - - - 
 
+EES_Q25 <- 
+  haven::read_dta(paste0(getwd(), '/data/' ,'EES_2019_Q25_aux.dta')) 
 
+EES2019 <- left_join(EES2019, EES_Q25)
+
+rm(EES_Q25)
+
+EES2019 %<>%
+  dplyr::mutate(Q25 = Q25_rec) %>%
+  dplyr::select(-c(Q25_rec))
 
 # Select country-specific data frames for stacking # ==================================================
 
 EES2019_it <- EES2019 %>% dplyr::filter(countrycode==1380) # EES2019 Italian voter study
-EES_codebook_it <- EES_codebook %>% dplyr::filter(countrycode==1380) # EES2019 Italian voter study
-rm(EES2019, EES_codebook)
-
+rm(EES2019)
 
 # Select the relevant variables # =====================================================================
 
@@ -86,8 +82,6 @@ EES2019_it %<>% dplyr::select(respid, D3, D4_1, EDU,
                               Q23, starts_with('q24'), 
                               Q25, Q26,
                               lrgen, eu_position)
-
-EES_codebook_it %<>% dplyr::select(-c(countrycode))
 
 
 # Create additional variables # =======================================================================
@@ -106,16 +100,6 @@ names(EES2019_it)[names(EES2019_it)=='EDU'] <- 'edu'
 # Party identification # ==============================================================================
 
 # Recode the party identification variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-# left_join(EES2019_it, EES_codebook_it) %>% dplyr::select(Q7, Q25, Q25_rec)
-
-EES2019_it <- 
-  dplyr::left_join(EES2019_it, EES_codebook_it) %>%
-  dplyr::mutate(Q25 = Q25_rec) %>%
-  dplyr::select(-c(Q25_rec))
-
-rm(EES_codebook_it)
-
 
 EES2019_it <- cbind(EES2019_it, 
                     gendicovar(data = EES2019_it,
@@ -468,6 +452,14 @@ EES2019_it_stacked %<>%
 
 
 # Save the stacked data frame # =======================================================================
+
+# Marginal recode for age - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it_stacked %<>%
+  dplyr::mutate(age = case_when(is.na(age) ~ 999,
+                                T~age))
+
+# Save the dataset and set NAs to 99 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 fwrite(EES2019_it_stacked, file=paste0(getwd(), '/data/', 'EES2019_it_stacked_R.csv'), na = 99)
 

@@ -97,7 +97,10 @@ Values:
 99 - Missing
 
 ## pid {-}
-EES 2019 original party identification variable (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). 
+EES 2019 party identification variable (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)), recoded according to the 2019 European Parliament (EP) Elections vote choice variable values (`Q7`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). 
+
+Example:
+In the EES 2019 voter study, the party code of the 2019 EP elections vote choice variable (`Q7`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)) that refers to the Italian Democratic Party (*Partito Democratico*) is `1501`. However, in the party identification variable of the EES 2019 voter study  (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)) the Italian Democratic Party is coded `1502`. Consequently, the choice has been to recode the latter in accordance with the former.
 
 Values:
 
@@ -107,6 +110,16 @@ Values:
 
 99 - Missing
 
+## pid_str
+Recoded EES 2019 original variable indicating the respondent strength of party identification (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)) with the party specified in `pid` variable. 
+
+Values: 
+
+1 -
+2 -
+3 -
+
+99 - Missing
 
 ## age {-}
 Age of the respondents. Computed by substracting the EES 2019 respondents' birth year variable (`D4_1`) to the survey year (2019). 

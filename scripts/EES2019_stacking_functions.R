@@ -50,7 +50,7 @@ genstackedvar.int.fun <- function(data, depvar, index, refvar) {
   
   data[[newvar]] <- data[[depvar]]
   exprss <- paste0('case_when(', refvar, '==', index, ' ~ ', depvar,',', 
-                   # 'is.na(', refvar, ') ~ NA_real_,',
+                   'is.na(', refvar, ') ~ NA_real_,',
                    'T ~ 0)')
   q <- quote(mutate(data, !! newvar := exprss))
   df2 <- 

@@ -1,5 +1,5 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Title: Auxiliary Dataframe for Stata (EES ~ AUX ~ CHES)
+# Title: Auxiliary Dataframe(s) for Stata (EES ~ AUX ~ CHES)
 # Author: G.Carteny
 # last update: 2021-05-30
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,5 +105,26 @@ rm(list=ls(pattern='contxt_vars'))
 # Save the data frame # =============================================================================
 
 haven::write_dta(data = EES2019, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")))
+
+rm(list=ls(pattern="CHES|aux"))
+
+# EES codebook for PID recoding # =====================================================================
+
+EES_codebook <- 
+  data.table::fread(paste0(getwd(), '/data/' ,'ZA7581_cp.csv')) %>%
+  haven::zap_labels(.) %>%
+  dplyr::mutate(Q25 = q25, 
+                Q25_rec = Q7,
+                Q10_PTV = case_when(Q10_PTV=='' ~ NA_character_,
+                                    T ~ Q10_PTV)) %>% 
+  dplyr::select(countrycode, Q10_PTV, Q25, Q25_rec) %>%
+  na.omit() %>% 
+  dplyr::select(countrycode, Q25, Q25_rec) %>%
+  dplyr::mutate(across(names(.), ~as.numeric(.)))
+
+
+# Save the data frame # =============================================================================
+
+haven::write_dta(data = EES_codebook, path(paste0(getwd(), '/data/' ,"EES_2019_Q25_aux.dta")))
 
 rm(list=ls(pattern="CHES|aux"))
