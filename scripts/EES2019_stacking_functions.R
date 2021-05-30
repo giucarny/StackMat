@@ -20,7 +20,6 @@ gendist <- function(data, indices, stub1, stub2) {
   return(df)
 }
 
-
 # Functions for generating dichotomous variables - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 gendicovar.int.fun <- function(data, depvar, index) {
@@ -39,6 +38,30 @@ gendicovar.int.fun <- function(data, depvar, index) {
 
 gendicovar <- function(data, indices, stub) {
   df <- lapply(data=data, X = indices, depvar = stub, FUN = gendicovar.int.fun) %>% do.call('cbind',.)
+  return(df)
+}
+
+
+# Additional function for creating stacked variables - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+genstackedvar.int.fun <- function(data, depvar, index, refvar) {
+  
+  newvar = paste0(depvar, '_stack_', index)
+  
+  data[[newvar]] <- data[[depvar]]
+  exprss <- paste0('case_when(', refvar, '==', index, ' ~ ', depvar,',', 
+                   # 'is.na(', refvar, ') ~ NA_real_,',
+                   'T ~ 0)')
+  q <- quote(mutate(data, !! newvar := exprss))
+  df2 <- 
+    eval(parse(text=sub("exprss", exprss, deparse(q)))) %>% 
+    dplyr::select(all_of(newvar)) %>%
+    as_tibble()
+  return(df2)
+}
+
+genstackedvar <- function(data, indices, stub1, stub2) {
+  df <- lapply(data=data, X = indices, depvar = stub1, refvar = stub2, FUN = genstackedvar.int.fun) %>% do.call('cbind',.)
   return(df)
 }
 
