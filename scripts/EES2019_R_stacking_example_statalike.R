@@ -51,7 +51,8 @@ rm(EES2019)
 EES2019_it %<>% dplyr::select(respid, D3, D4_1, EDU, 
                               Q7, starts_with('q10'), 
                               Q11, starts_with('q13'),  
-                              Q23, starts_with('q24'), Q25)
+                              Q23, starts_with('q24'), 
+                              Q25, Q26)
 
 
 # Create additional variables # =======================================================================
@@ -84,6 +85,22 @@ EES2019_it <- cbind(EES2019_it,
                     gendicovar(data = EES2019_it,
                                indices = 1501:1507, 
                                stub = 'Q25'))
+
+
+
+# Recode the pid strength variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(Q26 = case_when(Q26==0 ~ 0, 
+                                Q26==1 ~ 3,
+                                Q26==3 ~ 1, 
+                                T ~ Q26)) 
+
+
+# Generate the stacked pid strenght variable # - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it <- cbind(EES2019_it, 
+                    genstackedvar(EES2019_it, indices = 1501:1507, stub1 = 'Q26', stub2 = 'Q25'))
 
 
 # Dependent variables =================================================================================
@@ -327,10 +344,10 @@ EES2019_it_stacked <- genstacks(data = EES2019_it,
                                 stubs = c('q10_',
                                           'q13_mean_', 'q13_dist_',
                                           'q24_mean_', 'q24_dist_',
-                                          'Q7_stack_', 'Q25_stack_',
+                                          'Q7_stack_', 'Q25_stack_', 'Q26_stack_',
                                           'age_cont_yhat_', 'age_dich_yhat_', 
                                           'socdem_dich_yhat_', 'socdem_cont_yhat_'),
-                                keepvar = c('Q7', 'Q25', 'Q11','Q23', 'age', 'gndr', 'edu'))
+                                keepvar = c('Q7', 'Q25', 'Q26', 'Q11','Q23', 'age', 'gndr', 'edu'))
 
 # Mutate the dataset ==================================================================================
 
@@ -341,6 +358,7 @@ EES2019_it_stacked %<>%
                 stackid = paste0(respid, "-", party),
                 votech = Q7,
                 pid = Q25, 
+                pid_str = Q26,
                 lr_self = Q11,
                 lr_party = q13_mean_,
                 euint_self = Q23,
@@ -350,15 +368,16 @@ EES2019_it_stacked %<>%
                 lr_dist = q13_dist_,
                 euint_dist = q24_dist_,
                 stacked_pid = Q25_stack_,
+                stacked_pid_str = Q26_stack_,
                 age_cont_yhat = age_cont_yhat_,
                 age_dich_yhat = age_dich_yhat_,
                 socdem_cont_yhat = socdem_cont_yhat_,
                 socdem_dich_yhat = socdem_dich_yhat_,
                 pid = Q25,
                 ) %>%
-  dplyr::select(respid, party, stackid, votech, pid, age, gndr, edu,
+  dplyr::select(respid, party, stackid, votech, pid, pid_str, age, gndr, edu,
                 lr_self, lr_party, euint_self, euint_party, 
-                ptv, stacked_votech, lr_dist, euint_dist, stacked_pid,
+                ptv, stacked_votech, lr_dist, euint_dist, stacked_pid, stacked_pid_str,
                 age_dich_yhat, age_cont_yhat, socdem_dich_yhat, socdem_cont_yhat)
 
 
