@@ -34,6 +34,10 @@ if (grepl('StackMat-master', getwd()) | grepl('StackMat', getwd())) {
 
 # Load data # =========================================================================================
 
+# Select the relevant parties # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+rel_prties <- 1501:1507 %>% as.numeric()
+
 # Load the EES 2019 voter study dataset (Stata version) # - - - - - - - - - - - - - - - - - - - - - - -
 EES2019 <- 
   haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta')) %>%
@@ -50,11 +54,28 @@ EES2019_aux <-
 # Join the datasets by 'respid', 'countrycode', and 'Q7'
 
 EES2019 <- left_join(EES2019, EES2019_aux)
+rm(EES2019_aux)
+
+# Load a second auxiliary dataset (EES codebook) # - - - - - - - - - - - - - - - - - - - - - - - - - -
+EES_codebook <- 
+  data.table::fread(paste0(getwd(), '/data/' ,'ZA7581_cp.csv')) %>%
+  haven::zap_labels(.) %>%
+  dplyr::mutate(Q25 = q25, 
+                Q25_rec = Q7,
+                Q10_PTV = case_when(Q10_PTV=='' ~ NA_character_,
+                                    T ~ Q10_PTV)) %>% 
+  dplyr::select(countrycode, Q10_PTV, Q25, Q25_rec) %>%
+  na.omit() %>% 
+  dplyr::select(countrycode, Q25, Q25_rec) %>%
+  dplyr::mutate(across(names(.), ~as.numeric(.)))
+
+
 
 # Select country-specific data frames for stacking # ==================================================
 
 EES2019_it <- EES2019 %>% dplyr::filter(countrycode==1380) # EES2019 Italian voter study
-rm(EES2019)
+EES_codebook_it <- EES_codebook %>% dplyr::filter(countrycode==1380) # EES2019 Italian voter study
+rm(EES2019, EES_codebook)
 
 
 # Select the relevant variables # =====================================================================
@@ -65,6 +86,8 @@ EES2019_it %<>% dplyr::select(respid, D3, D4_1, EDU,
                               Q23, starts_with('q24'), 
                               Q25, Q26,
                               lrgen, eu_position)
+
+EES_codebook_it %<>% dplyr::select(-c(countrycode))
 
 
 # Create additional variables # =======================================================================
@@ -80,24 +103,24 @@ EES2019_it %<>%
 names(EES2019_it)[names(EES2019_it)=='D3'] <- 'gndr'
 names(EES2019_it)[names(EES2019_it)=='EDU'] <- 'edu'
 
-# Select the relevant parties # =======================================================================
-
-rel_prties <- 1501:1507 %>% as.numeric()
-
 # Party identification # ==============================================================================
 
 # Recode the party identification variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-EES2019_it %<>% 
-  dplyr::mutate(Q25 = case_when(Q25 >=1508  ~ NA_real_, 
-                                Q25 < 100 ~ NA_real_,
-                                T ~ Q25))  
+# left_join(EES2019_it, EES_codebook_it) %>% dplyr::select(Q7, Q25, Q25_rec)
+
+EES2019_it <- 
+  dplyr::left_join(EES2019_it, EES_codebook_it) %>%
+  dplyr::mutate(Q25 = Q25_rec) %>%
+  dplyr::select(-c(Q25_rec))
+
+rm(EES_codebook_it)
+
 
 EES2019_it <- cbind(EES2019_it, 
                     gendicovar(data = EES2019_it,
                                indices = 1501:1507, 
                                stub = 'Q25'))
-
 
 
 # Recode the pid strength variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -106,7 +129,9 @@ EES2019_it %<>%
   dplyr::mutate(Q26 = case_when(Q26==0 ~ 0, 
                                 Q26==1 ~ 3,
                                 Q26==3 ~ 1, 
-                                T ~ Q26)) 
+                                T ~ Q26)) %>%
+  dplyr::mutate(Q26 = case_when(is.na(Q25) ~ NA_real_,
+                                T ~ Q26))
 
 
 # Generate the stacked pid strenght variable # - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -403,6 +428,8 @@ EES2019_it_stacked <- genstacks(data = EES2019_it,
                                           'age_cont_yhat_', 'age_dich_yhat_', 
                                           'socdem_dich_yhat_', 'socdem_cont_yhat_'),
                                 keepvar = c('Q7', 'Q25', 'Q26', 'Q11','Q23', 'age', 'gndr', 'edu'))
+
+rm(EES2019_it)
 
 # Mutate the dataset ==================================================================================
 
