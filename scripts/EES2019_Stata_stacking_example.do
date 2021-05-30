@@ -41,7 +41,7 @@ keep if countrycode==1380 // EES2019 Italian voter study
 
 * Select the relevant variables ================================================
 
-keep respid Q7 q10* Q11 q13* D3 D4_1 Q23 q24* Q25 EDU
+keep respid Q7 q10* Q11 q13* D3 D4_1 Q23 q24* Q25 Q26 EDU
 
 
 * Create additional variables ==================================================
@@ -72,6 +72,18 @@ forvalues j = 1501/1507 {
 	replace Q25_stack_`j' = 1 if Q25_stack_`j'==`j' 
 	replace Q25_stack_`j' = 0 if Q25_stack_`j'!=`j' & Q25_stack_`j'!=1
 	replace Q25_stack_`j' = . if missing(Q25)
+}
+
+
+// Recode the PID-strength variable - - - - - - - - - - - - - - - - - - - - - - 
+
+recode Q26 (0=0) (2=2) (3=1) (1=3)
+
+// Generate a set of PID-strength variables for stacking - - - - - - - - - - - -
+
+forvalues i = 1501/1507 {
+    generate Q26_stack_`i' = Q26 if Q25==`i'
+	replace Q26_stack_`i'=0 if missing(Q26_stack_`i')
 }
 
 
@@ -227,7 +239,7 @@ drop edu1 edu2 edu3
 // 'genstacks' is the 'StackMe' function for stacking the data frame obs.
 * help genstacks
 genstacks q10_ q13_mean_ q13_dist_ q24_mean_ q24_dist_ ///
-Q25_stack_ /// 
+Q25_stack_ Q26_stack_ /// 
 Q7_ Q7_stack_ ///
 age_dich_yhat_ age_cont_yhat_ ///
 socdem_dich_yhat_ socdem_cont_yhat_, rep 
@@ -251,6 +263,7 @@ drop respid2 party2
 * Voting behavior and Background variables - - - - - - - - - - - - - - - - - - -
 ren Q7_ votech
 ren Q25 pid
+ren Q26 pid_str
 
 * Voter-Party distance variables - - - - - - - - - - - - - - - - - - - - - - - -
 ren Q11 lr_self
@@ -264,23 +277,24 @@ ren Q7_stack_ stacked_vc
 ren q13_dist_ lr_dist
 ren q24_dist_ euint_dist
 ren Q25_stack_ stacked_pid
+ren Q26_stack_ stacked_pid_str
 ren age_dich_yhat_ age_dich_yhat
 ren age_cont_yhat_ age_cont_yhat
 ren socdem_dich_yhat_ socdem_dich_yhat
 ren socdem_cont_yhat_ socdem_cont_yhat
 
 keep respid party stackid ///
-votech pid age gndr edu /// 
+votech pid pid_str age gndr edu /// 
 lr_self lr_party ///
 euint_self euint_party ///
-ptv stacked_vc lr_dist euint_dist stacked_pid ///
+ptv stacked_vc lr_dist euint_dist stacked_pid stacked_pid_str ///
 age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
 
 order respid party stackid ///
-votech pid age gndr edu /// 
+votech pid pid_str age gndr edu /// 
 lr_self lr_party ///
 euint_self euint_party ///
-ptv stacked_vc lr_dist euint_dist stacked_pid ///
+ptv stacked_vc lr_dist euint_dist stacked_pid stacked_pid_str ///
 age_dich_yhat age_cont_yhat socdem_dich_yhat socdem_cont_yhat
 
 * Recode all the missing values and save the dataset ===========================
