@@ -115,9 +115,9 @@ Recoded EES 2019 original variable indicating the respondent strength of party i
 
 Values: 
 
-1 - Merely a sympathiser
-2 - Fairly close
-3 - Very close to the party 
+1 - Merely a sympathiser  
+2 - Fairly close  
+3 - Very close to the party  
 
 99 - Missing OR does not identify with any relevant political party (see `party`)
 
