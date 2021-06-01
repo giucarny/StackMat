@@ -1,7 +1,7 @@
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 * Title: Script for Stacking Data (EES 2019 Voter Study, Italian Sample) 
 * Author: G.Carteny
-* last update: 2021-05-27
+* last update: 2021-06-01
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 * Install the 'StackMe' package if not already done ============================
@@ -34,22 +34,18 @@ cd "C:\Users\giuse\Documents\GIT\StackMat\data"
 use "ZA7581_v1-0-0.dta", clear
 //use "EES_CHES_2019_aux.dta", clear
 
-* Merge with auxiliary dataset (w/ CHES party-specific scores & other vars) ====
+* Merge with auxiliary dataset (w/ & other vars) ====
 
-
+// CHES party-specific scores - - - - - - - - - - - - - - - - - - - - - - - - -
 merge 1:m respid countrycode Q7 using EES_CHES_2019_aux
 drop _merge
 
+// 'Recoding' of Q25 variable - - - - - - - - - - - - - - - - - - - - - - - - -   
 merge 1:m respid countrycode Q25 using EES_2019_Q25_aux
 drop _merge
 
 drop Q25
 ren Q25_rec Q25
-
-foreach var of varlist _all {
-	label var `var' ""
-}
-
 
 * Select country-specific data frames for stacking =============================
 
@@ -366,6 +362,11 @@ foreach x of varlist * {
         recode `x' (. = 99)
     }
  }
+ 
+ foreach var of varlist _all {
+	label var `var' ""
+}
+
 
 
 export delimited using "EES2019_it_stacked_stata.csv",  nolabel replace
