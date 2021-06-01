@@ -144,8 +144,8 @@ genstacks <- function(idvar, data, stubs, keepvar) {
       
       keepvar %<>% as.character()
       
-      if (any(keepvar %in% colnames(EES2019_it))) {
-        if(all(keepvar %in% colnames(EES2019_it))) {
+      if (any(keepvar %in% colnames(data))) {
+        if(all(keepvar %in% colnames(data))) {
           df <- data %>% dplyr::select(all_of(idvar), all_of(keepvar))
           names(df)[[1]] <- 'Var1'
           stack_df <- left_join(stack_df, df, by = 'Var1')
@@ -153,7 +153,7 @@ genstacks <- function(idvar, data, stubs, keepvar) {
           names(stack_df)[names(stack_df)=='Var2'] <- 'stack'
           return(stack_df)
         } else {
-          x <- which(keepvar %in% colnames(EES2019_it))
+          x <- which(keepvar %in% colnames(data))
           df <- data %>% dplyr::select(all_of(idvar), keepvar[c(x)])
           names(df)[[1]] <- 'Var1'
           stack_df <- left_join(stack_df, df, by = 'Var1')
