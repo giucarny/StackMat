@@ -86,6 +86,8 @@ EES 2019 original vote choice variable, referring to 2019 EP elections responden
 
 Values: 
 
+0 - Did not vote
+
 1501 - Democratic Party (*Partito Democratico*)  
 1502 - Go Italy (*Forza Italia*)  
 1503 - Northern League (*Lega - Salvini Premier*)  
@@ -94,7 +96,7 @@ Values:
 1506 - More Europe (*+Europa*)  
 1507 - Brothers of Italy (*Fratelli d'Italia*)  
 
-99 - Missing OR did not vote OR voted for another party
+99 - Missing OR Voted for another party
 
 ## pid {-}
 EES 2019 party identification variable (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)), recoded according to the 2019 European Parliament (EP) Elections vote choice variable values (`Q7`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)). 
