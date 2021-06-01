@@ -51,6 +51,11 @@ ren Q25_rec Q25
 
 keep if countrycode==1380 // EES2019 Italian voter study
 
+*  Select the relevant parties =================================================
+
+* relevant parties: 1501 1502 1503 1504 1505 1506 1507
+
+
 * Select the relevant variables ================================================
 
 keep respid countrycode Q7 q10* Q11 q13* D3 D4_1 Q23 q24* Q25 Q26 EDU ///
@@ -68,10 +73,40 @@ drop D4_1
 ren D3 gndr
 ren EDU edu
 
+* Dependent variables ==========================================================
 
-*  Select the relevant parties =================================================
+// Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - 
+replace Q7=. if Q7<100 & Q7>0
+replace Q7=. if Q7>=1508
 
-* relevant parties: 1501 1502 1503 1504 1505 1506 1507
+// Generate a set of dichotomous variables from the EP vote choice one - - - - -
+forvalues i = 1501/1507 {
+    generate Q7_`i' = Q7
+	generate Q7_stack_`i' = Q7
+	replace Q7_stack_`i' = 1 if Q7_stack_`i'==`i' 
+	replace Q7_stack_`i' = 0 if Q7_stack_`i'!=`i' & Q7_stack_`i'!=1
+	replace Q7_stack_`i' = . if missing(Q7_`i')
+}
+
+// Drop the empty PTV variables - - - - - - - - - - - - - - - - - - - - - - - -
+drop q10_8 q10_9 q10_10
+
+// Rename the ptv variables in accordance w/ relevant parties codes # - - - - - 
+
+forvalues i = 1/7 {
+rename q10_`i' q10_150`i'
+}
+
+// Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - 
+forvalues i = 1501/1507 {
+replace q10_`i'=. if q10_`i'>10 
+}
+
+// Rescale the PTV values - - - - - - - - - - - - - - - - - - - - - - - - - - -
+forvalues i = 1501/1507 {
+replace q10_`i'= q10_`i'/10
+}
+
 
 * Party identification =========================================================
 
@@ -79,17 +114,12 @@ ren EDU edu
 // with the party choice variable (Q7)
 
 
-
-// Recode the party identification variable - - - - - - - - - - - - - - - - - - 
-replace Q25=. if Q25<100 
-replace Q25=. if Q25>=1508
-
 // Generate a set of dichotomous variables from the PID variable - - - - - - - -
-forvalues j = 1501/1507 {
-	generate Q25_stack_`j' = Q25
-	replace Q25_stack_`j' = 1 if Q25_stack_`j'==`j' 
-	replace Q25_stack_`j' = 0 if Q25_stack_`j'!=`j' & Q25_stack_`j'!=1
-	replace Q25_stack_`j' = . if missing(Q25)
+forvalues i = 1501/1507 {
+	generate Q25_stack_`i' = Q25
+	replace Q25_stack_`i' = 1 if Q25_stack_`i'==`i' 
+	replace Q25_stack_`i' = 0 if Q25_stack_`i'!=`i' & Q25_stack_`i'!=1
+	replace Q25_stack_`i' = . if missing(Q25)
 }
 
 
@@ -106,88 +136,58 @@ forvalues i = 1501/1507 {
 
 replace Q26=. if missing(Q25)
 
-* Dependent variables ==========================================================
-
-// Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - 
-replace Q7=. if Q7<100 
-replace Q7=. if Q7>=1508
-
-// Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - 
-forvalues j = 1/7 {
-replace q10_`j'=. if q10_`j'>10 
-}
-
-// Rescale the PTV values - - - - - - - - - - - - - - - - - - - - - - - - - - -
-forvalues j = 1/7 {
-replace q10_`j'= q10_`j'/10
-}
-
-// Drop the empty PTV variables - - - - - - - - - - - - - - - - - - - - - - - -
-drop q10_8 q10_9 q10_10
-
-// Rename the PTV variables for the stacking procedure - - - - - - - - - - - - -
-local oldnm q10_1 q10_2 q10_3 q10_4 q10_5 q10_6 q10_7
-local newnm q10_1501 q10_1502 q10_1503 q10_1504 q10_1505 q10_1506 q10_1507
-rename (`oldnm') (`newnm')
-
-// Generate a set of dichotomous variables from the EP vote choice one - - - - -
-forvalues j = 1501/1507 {
-    generate Q7_`j' = Q7
-	generate Q7_stack_`j' = Q7
-	replace Q7_stack_`j' = 1 if Q7_stack_`j'==`j' 
-	replace Q7_stack_`j' = 0 if Q7_stack_`j'!=`j' & Q7_stack_`j'!=1
-	replace Q7_stack_`j' = . if missing(Q7_`j')
-}
 
 * LR distance ==================================================================
 
 // Drop variable related to non-relevant parties - - - - - - - - - - - - - - - -
 drop q13_8 q13_9
 
+// Rename the individual perceptions of party positions - - - - - - - - - - - -
+
+forvalues i = 1/7 {
+    rename q13_`i' q13_150`i'
+}
+
 // Recode missing values and rescale LR self placement - - - - - - - - - - - - -
 replace Q11=. if Q11>10
 
-forvalues j = 1/7 {
-replace q13_`j'=. if q13_`j'>10 
+forvalues i = 1501/1507 {
+replace q13_`i'=. if q13_`i'>10 
 }
 
+
+// Rescale respondents' positions - - - - - - - - - - - - - - - - - - - - - - -
 replace Q11 = Q11/10
 
 
 // Rescale individual perceptions of party positions - - - - - - - - - - - - - -
-forvalues i = 1/7 {
+forvalues i = 1501/1507 {
     replace q13_`i' = q13_`i'/10	
 }
 
 // Generate mean values of party positions - - - - - - - - - - - - - - - - - - -
-forvalues i = 1/7 {
-egen q13_mean_150`i' = mean(q13_`i')	
+forvalues i = 1501/1507 {
+egen q13_mean_`i' = mean(q13_`i')	
 }
 
 // Generate mean values of party positions for ches var - - - - - - - - - - - - 
-forvalues i = 1/7 {
-gen lrgen2_stack_150`i' = lrgen if Q7==150`i'	
-egen lrgen_stack_150`i' = mean(lrgen2_stack_150`i')
-drop lrgen2_stack_150`i'
+forvalues i = 1501/1507 {
+gen lrgen2_stack_`i' = lrgen if Q7==`i'	
+egen lrgen_stack_`i' = mean(lrgen2_stack_`i')
+drop lrgen2_stack_`i'
 }
 
 drop lrgen
 
 // Generate LR distance variables - - - - - - - - - - - - - - - - - - - - - - -
-forvalues j = 1/7 {
-    gen q13_dist_150`j' = abs(q13_mean_150`j' - Q11)
+forvalues i = 1501/1507 {
+    gen q13_dist_`i' = abs(q13_mean_`i' - Q11)
 }
 
 // Generate LR distance variables w/ ches var - - - - - - - - - - - - - - - - - 
-forvalues j = 1/7 {
-    gen lrgen_dist_150`j' = abs(lrgen_stack_150`j' - Q11)
+forvalues i = 1501/1507 {
+    gen lrgen_dist_`i' = abs(lrgen_stack_`i' - Q11)
 }
-
-// Drop the variables used for computing the distances - - - - - - - - - - - - -
-forvalues j = 1/7 {
-drop q13_`j'
-}
-
 
 
 * EU integration distances =====================================================
@@ -195,51 +195,55 @@ drop q13_`j'
 // Drop variable related to non-relevant parties - - - - - - - - - - - - - - - -
 drop q24_8 q24_9
 
+// Rename the individual perceptions of party positions - - - - - - - - - - - -
+
+forvalues i = 1/7 {
+    rename q24_`i' q24_150`i'
+}
+
 // Recode missing values - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 replace Q23=. if Q23>10
 
-
-forvalues j = 1/7 {
-replace q24_`j'=. if q24_`j'>10 
+forvalues i = 1501/1507 {
+replace q24_`i'=. if q24_`i'>10 
 }
 
+
+// Rescale respondents' positions - - - - - - - - - - - - - - - - - - - - - - - 
 replace Q23 = Q23/10
 
+
 // Rescale individual perceptions of party positions - - - - - - - - - - - - - -
-forvalues i = 1/7 {
+forvalues i = 1501/1507 {
     replace q24_`i' = q24_`i'/10	
 }
 
 
 // Generate mean values of party positions on EU integration - - - - - - - - - -
-forvalues i = 1/7 {
-egen q24_mean_150`i' = mean(q24_`i')	
+forvalues i = 1501/1507 {
+egen q24_mean_`i' = mean(q24_`i')	
 }
 
 // Generate mean values of party positions for ches var - - - - - - - - - - - - 
-forvalues i = 1/7 {
-gen eu_position2_stack_150`i' = eu_position if Q7==150`i'	
-egen eu_position_stack_150`i' = mean(eu_position2_stack_150`i')
-drop eu_position2_stack_150`i'
+forvalues i = 1501/1507 {
+gen eu_position2_stack_`i' = eu_position if Q7==`i'	
+egen eu_position_stack_`i' = mean(eu_position2_stack_`i')
+drop eu_position2_stack_`i'
 }
 
 drop eu_position
 
 
 // Generate EU integration distance variables - - - - - - - - - - - - - - - - - 
-forvalues j = 1/7 {
-gen q24_dist_150`j' = abs(q24_mean_150`j' - Q23)
+forvalues i = 1501/1507 {
+gen q24_dist_`i' = abs(q24_mean_`i' - Q23)
 }
 
 // Generate EU integration distance variables w/ ches var - - - - - - - - - - - 
-forvalues j = 1/7 {
-    gen eu_position_dist_150`j' = abs(eu_position_stack_150`j' - Q23)
+forvalues i = 1501/1507 {
+    gen eu_position_dist_`i' = abs(eu_position_stack_`i' - Q23)
 }
 
-// Drop the variables used for computing the distances - - - - - - - - - - - - -
-forvalues j = 1/7 {
-drop q24_`j'
-}
 
 * Sociodemographic yhats =======================================================
 
@@ -257,26 +261,29 @@ recode edu3 (3 = 1) (1 2 = 0)
 * Recode gender (category 3 with too few observations) - - - - - - - - - - - - -
 replace gndr = . if gndr==3
 
+
 * age - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Generate yhats for a dichotomous dependent variable
-forvalues j = 1/7 {
-genyhats age_dich_yhat_150`j': age, dep(Q7_stack_150`j') log adjust(no)	
+forvalues i = 1501/1507 {
+genyhats age_dich_yhat_`i': age, dep(Q7_stack_`i') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
-forvalues j = 1/7 {
-genyhats age_cont_yhat_150`j': age, dep(q10_150`j') adjust(no)	
+forvalues i = 1501/1507 {
+genyhats age_cont_yhat_`i': age, dep(q10_`i') adjust(no)	
 }
+
 
 * age gender education - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 // Generate yhats for a dichotomous dependent variable
-forvalues j = 1/7 {
-genyhats socdem_dich_yhat_150`j': age gndr edu1 edu2 edu3, dep(Q7_stack_150`j') log adjust(no)	
+forvalues i = 1501/1507 {
+genyhats socdem_dich_yhat_`i': age gndr edu1 edu2 edu3, dep(Q7_stack_`i') log adjust(no)	
 }
 
 // Generate yhats for a continuous dependent variable
-forvalues j = 1/7 {
-genyhats socdem_cont_yhat_150`j': age gndr edu1 edu2 edu3, dep(q10_150`j')  adjust(no)	
+forvalues i = 1501/1507 {
+genyhats socdem_cont_yhat_`i': age gndr edu1 edu2 edu3, dep(q10_`i')  adjust(no)	
 }
 
 
