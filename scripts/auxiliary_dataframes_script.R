@@ -116,25 +116,26 @@ EES_Q25 <-
   data.table::fread(paste0(getwd(), '/data/' ,'ZA7581_cp.csv')) %>%
   haven::zap_labels(.) %>%
   dplyr::mutate(Q25 = q25, 
-                Q25_rec = Q7,
-                Q10_PTV = case_when(Q10_PTV=='' ~ NA_character_,
-                                    T ~ Q10_PTV)) %>% 
-  dplyr::select(countrycode, Q10_PTV, Q25, Q25_rec) %>%
-  na.omit() %>% 
+                Q25_rec = Q7) %>% 
   dplyr::select(countrycode, Q25, Q25_rec) %>%
-  dplyr::mutate(across(names(.), ~as.numeric(.)))
+  dplyr::mutate(across(names(.), ~as.numeric(.))) %>%
+  distinct()
 
 # Reload the EES 2019 voter study dataset # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 EES2019 <- 
   haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta')) %>%
   dplyr::select(respid, countrycode, Q25) %>%
-  dplyr::mutate(across(names(.), ~as.numeric(.)))
+  dplyr::mutate(across(names(.), ~as.numeric(.))) 
 
-EES_Q25 <- left_join(EES2019, EES_Q25) 
 
-# %>%
-#  mutate(Q25 = Q25_rec) %>%
-#  dplyr::select(-c(Q25_rec))
+EES_Q25 <- 
+  left_join(EES2019, EES_Q25) %>%
+  group_by(countrycode) %>%
+  mutate(Q25_aux = case_when(Q25<100 ~ NA_real_, 
+                             T~Q25)) %>%
+  mutate(Q25_rec = case_when(Q25_aux==min(Q25_aux, na.rm=T) ~ 0, 
+                             T~Q25_rec)) %>%
+  dplyr::select(-c(Q25_aux))
 
 
 # Save the data frame # =============================================================================
