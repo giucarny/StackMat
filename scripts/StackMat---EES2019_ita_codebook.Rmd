@@ -2,7 +2,7 @@
 title: Stacked Data Matrices Workshop
 subtitle: EES 2019 Italian Voter Study - Stacked Dataset Codebook
 author: Giuseppe Carteny
-date: 31.05.2021 
+date: 01.06.2021 
 toc: true
 output: 
   bookdown::pdf_document2:
@@ -104,22 +104,25 @@ In the EES 2019 voter study, the party code of the 2019 EP elections vote choice
 
 Values:
 
+0 - Does not identify with any relevant political party (see `party`)
+
 1501 - Does identify with political party 1501  
 ...   
 1507 - Does identify with political party 1507  
 
-99 - Missing OR does not identify with any relevant political party (see `party`)
+99 - Missing 
 
 ## pid_str {-}
 Recoded EES 2019 original variable indicating the respondent strength of party identification (`Q25`; See the [EES2019 Codebook](https://dbk.gesis.org/dbksearch/download.asp?id=67448)) with the party specified in `pid` variable. 
 
 Values: 
 
+0 - Does not identify with any relevant political party (see `party`)  
 1 - Merely a sympathiser  
-2 - Fairly close  
-3 - Very close to the party  
+2 - Fairly close   
+3 - Very close to the party   
 
-99 - Missing OR does not identify with any relevant political party (see `party`)
+99 - Missing 
 
 ## age {-}
 Age of the respondents. Computed by substracting the EES 2019 respondents' birth year variable (`D4_1`) to the survey year (2019). 
@@ -257,7 +260,7 @@ Values:
 0 - Does not identify with the stack party  
 1 - Does identify with the stack party
 
-99 - Missing OR does not identify with any relevant political party (see `party`)
+99 - Missing 
 
 
 ## stacked_pid_str {-}
@@ -265,11 +268,12 @@ Measure of the strength of the respondent identification with the stack party (`
 
 Values: 
 
+0 - Does not identify with the stack party
 1 - Merely a sympathiser of the stack party
 2 - Fairly close to the stack party
 3 - Very close to the stack party 
 
-99 - Missing OR does not identify with any relevant political party (see `party`)
+99 - Missing
 
 
 ## lr_dist  {-}

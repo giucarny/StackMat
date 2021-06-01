@@ -1,7 +1,7 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Title: Functions for Stacking Data ('StackMe' version) 
 # Author: G.Carteny
-# last update: 2021-05-26
+# last update: 2021-06-01
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Functions for generating party-voter distances - - - - - - - - - - - - - - - - - - - - - - - - - - - 

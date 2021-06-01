@@ -1,7 +1,7 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Title: Script for Stacking Data (EES 2019 Voter Study, Italian Sample) 
 # Author: G.Carteny
-# last update: 2021-05-27
+# last update: 2021-06-01
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Admin # =============================================================================================
@@ -447,7 +447,8 @@ EES2019_it_stacked %<>%
                 ) %>%
   dplyr::select(respid, party, stackid, votech, pid, pid_str, age, gndr, edu,
                 lr_self, lr_party, lr_party_ches, euint_self, euint_party, euint_party_ches, 
-                ptv, stacked_votech, lr_dist, euint_dist, stacked_pid, stacked_pid_str,
+                ptv, stacked_votech, lr_dist, lr_dist_ches, euint_dist, euint_dist_ches, 
+                stacked_pid, stacked_pid_str,
                 age_dich_yhat, age_cont_yhat, socdem_dich_yhat, socdem_cont_yhat)
 
 
