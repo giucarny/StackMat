@@ -99,7 +99,7 @@ names(EES2019_it)[names(EES2019_it)=='EDU'] <- 'edu'
 
 # Party identification # ==============================================================================
 
-# Recode the party identification variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Generate the pid stacked variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it <- cbind(EES2019_it, 
                     gendicovar(data = EES2019_it,
