@@ -20,17 +20,12 @@ options(scipen = 99)
 # Remove all the objects from the environment # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rm(list = ls())
 
-# Load auxiliary functions # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Check the working directory, set it, and load auxiliary functions # - - - - - - - - - - - - - - - - -
 
-if (grepl('StackMat-master', getwd()) | grepl('StackMat', getwd())) {
-  source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
-} else if (dir.exists(paste0(getwd(), '/Stackmat-master/'))) {
-  setwd(paste0(getwd(), '/Stackmat-master/'))
-  source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
-} else {
-  warning('Set the working directory in the ~/Stackmat or ~/Stackmat-master/ folder')
-}
+getwd()
 
+setwd("C:/Users/giuse/Documents/GIT/StackMat"))
+source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
 
 # Load data # =========================================================================================
 
