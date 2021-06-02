@@ -27,6 +27,7 @@ getwd()
 setwd("C:/Users/giuse/Documents/GIT/StackMat"))
 source(paste0(getwd(), '/scripts/', 'EES2019_stacking_functions.R'))
 
+
 # Load data # =========================================================================================
 
 # Select the relevant parties # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -101,6 +102,14 @@ EES2019_it %<>%
                                Q7<100 ~ NA_real_,
                                T ~ Q7))
 
+# Generate a set of dichotomous variables from the EP vote choice one - - - - - - - - - - - - - - - -
+
+EES2019_it <- cbind(EES2019_it, 
+                    gendicovar(data = EES2019_it,
+                               indices = 1501:1507, 
+                               stub = 'Q7'))
+
+
 # Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 EES2019_it %<>% 
@@ -120,15 +129,6 @@ EES2019_it %<>% dplyr::select(-c(paste0('q10_', seq(8,10,1))))
 
 names(EES2019_it)[startsWith(colnames(EES2019_it), 'q10_')] <- paste0('q10_', seq(1501, 1507, 1))
 
-
-# Generate a set of dichotomous variables from the EP vote choice one - - - - - - - - - - - - - - - -
-
-EES2019_it <- cbind(EES2019_it, 
-                    gendicovar(data = EES2019_it,
-                               indices = 1501:1507, 
-                               stub = 'Q7'))
-
-rm(list=ls(pattern='df'))
 
 
 # Party identification # ==============================================================================
@@ -439,7 +439,7 @@ EES2019_it_stacked %<>%
                 socdem_cont_yhat = socdem_cont_yhat_,
                 socdem_dich_yhat = socdem_dich_yhat_,
                 pid = Q25,
-                ) %>%
+  ) %>%
   dplyr::select(respid, party, stackid, votech, pid, pid_str, age, gndr, edu,
                 lr_self, lr_party, lr_party_ches, euint_self, euint_party, euint_party_ches, 
                 ptv, stacked_votech, lr_dist, lr_dist_ches, euint_dist, euint_dist_ches, 

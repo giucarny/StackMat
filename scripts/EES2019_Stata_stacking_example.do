@@ -75,7 +75,7 @@ ren EDU edu
 * Dependent variables ==========================================================
 
 // Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - 
-replace Q7=. if Q7<100 & Q7>0
+replace Q7=. if Q7<100 
 replace Q7=. if Q7>=1508
 
 // Generate a set of dichotomous variables from the EP vote choice one - - - - -
@@ -93,17 +93,17 @@ drop q10_8 q10_9 q10_10
 // Rename the ptv variables in accordance w/ relevant parties codes # - - - - - 
 
 forvalues i = 1/7 {
-rename q10_`i' q10_150`i'
+	rename q10_`i' q10_150`i'
 }
 
 // Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - 
 forvalues i = 1501/1507 {
-replace q10_`i'=. if q10_`i'>10 
+	replace q10_`i'=. if q10_`i'>10 
 }
 
 // Rescale the PTV values - - - - - - - - - - - - - - - - - - - - - - - - - - -
 forvalues i = 1501/1507 {
-replace q10_`i'= q10_`i'/10
+	replace q10_`i'= q10_`i'/10
 }
 
 
