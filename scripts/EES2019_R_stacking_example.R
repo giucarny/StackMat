@@ -97,33 +97,6 @@ EES2019_it %<>%
 names(EES2019_it)[names(EES2019_it)=='D3'] <- 'gndr'
 names(EES2019_it)[names(EES2019_it)=='EDU'] <- 'edu'
 
-# Party identification # ==============================================================================
-
-# Generate the pid stacked variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-EES2019_it <- cbind(EES2019_it, 
-                    gendicovar(data = EES2019_it,
-                               indices = 1501:1507, 
-                               stub = 'Q25'))
-
-
-# Recode the pid strength variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-EES2019_it %<>% 
-  dplyr::mutate(Q26 = case_when(Q26==0 ~ 0, 
-                                Q26==1 ~ 3,
-                                Q26==3 ~ 1, 
-                                T ~ Q26)) %>%
-  dplyr::mutate(Q26 = case_when(is.na(Q25) ~ NA_real_,
-                                T ~ Q26))
-
-
-# Generate the stacked pid strenght variable # - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-EES2019_it <- cbind(EES2019_it, 
-                    genstackedvar(EES2019_it, indices = 1501:1507, stub1 = 'Q26', stub2 = 'Q25'))
-
-
 # Dependent variables =================================================================================
 
 # Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -161,6 +134,33 @@ EES2019_it <- cbind(EES2019_it,
                                stub = 'Q7'))
 
 rm(list=ls(pattern='df'))
+
+
+# Party identification # ==============================================================================
+
+# Generate the pid stacked variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it <- cbind(EES2019_it, 
+                    gendicovar(data = EES2019_it,
+                               indices = 1501:1507, 
+                               stub = 'Q25'))
+
+
+# Recode the pid strength variable # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+EES2019_it %<>% 
+  dplyr::mutate(Q26 = case_when(Q26==0 ~ 0, 
+                                Q26==1 ~ 3,
+                                Q26==3 ~ 1, 
+                                T ~ Q26)) %>%
+  dplyr::mutate(Q26 = case_when(is.na(Q25) ~ NA_real_,
+                                T ~ Q26))
+
+
+# Generate the stacked pid strenght variable # - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+EES2019_it <- cbind(EES2019_it, 
+                    genstackedvar(EES2019_it, indices = 1501:1507, stub1 = 'Q26', stub2 = 'Q25'))
 
 
 # LR distance # =======================================================================================
