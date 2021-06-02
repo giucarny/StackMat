@@ -15,8 +15,9 @@
 * github install ldesio/stackme
 
 // NB: if you get any error it could be useful to uninstall previous versions of
-// and rerun the previous steps
+// the package and rerun the previous steps
 
+* ado uninstall github
 * ado uninstall stackme
 
 
@@ -26,15 +27,13 @@ pwd
 
 // set the working directory
 cd "C:\Users\giuse\Documents\GIT\StackMat\data"
-* ssc install unique
 
 
-* Load data ====================================================================
+* Load (and merge) data ========================================================
 
 use "ZA7581_v1-0-0.dta", clear
-//use "EES_CHES_2019_aux.dta", clear
 
-* Merge with auxiliary dataset (w/ & other vars) ====
+* Merge with auxiliary dataset (w/ & other vars) - - - - - - - - - - - - - - - -
 
 // CHES party-specific scores - - - - - - - - - - - - - - - - - - - - - - - - -
 merge 1:m respid countrycode Q7 using EES_CHES_2019_aux
