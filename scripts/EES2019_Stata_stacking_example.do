@@ -32,6 +32,7 @@ cd "C:\Users\giuse\Documents\GIT\StackMat\data"
 * Load (and merge) data ========================================================
 
 use "ZA7581_v1-0-0.dta", clear
+* use "ZA7581_v1-0-0_stata13.dta", clear
 
 * Merge with auxiliary dataset (w/ & other vars) - - - - - - - - - - - - - - - -
 
@@ -75,16 +76,15 @@ ren EDU edu
 * Dependent variables ==========================================================
 
 // Recode the EP elections vote choice variable - - - - - - - - - - - - - - - - 
-replace Q7=. if Q7<100 
+replace Q7=. if Q7<100 & Q7>0
 replace Q7=. if Q7>=1508
 
 // Generate a set of dichotomous variables from the EP vote choice one - - - - -
 forvalues i = 1501/1507 {
-    generate Q7_`i' = Q7
 	generate Q7_stack_`i' = Q7
 	replace Q7_stack_`i' = 1 if Q7_stack_`i'==`i' 
 	replace Q7_stack_`i' = 0 if Q7_stack_`i'!=`i' & Q7_stack_`i'!=1
-	replace Q7_stack_`i' = . if missing(Q7_`i')
+	replace Q7_stack_`i' = . if missing(Q7)
 }
 
 // Drop the empty PTV variables - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,24 +93,17 @@ drop q10_8 q10_9 q10_10
 // Rename the ptv variables in accordance w/ relevant parties codes # - - - - - 
 
 forvalues i = 1/7 {
-	rename q10_`i' q10_150`i'
+rename q10_`i' q10_150`i'
 }
 
-// Replace values bigger than 10 in the PTV var.s - - - - - - - - - - - - - - - 
+// Replace values bigger than 10 and rescale - - - - - - - - - - - - - - - 
 forvalues i = 1501/1507 {
-	replace q10_`i'=. if q10_`i'>10 
-}
-
-// Rescale the PTV values - - - - - - - - - - - - - - - - - - - - - - - - - - -
-forvalues i = 1501/1507 {
-	replace q10_`i'= q10_`i'/10
+replace q10_`i'=. if q10_`i'>10 
+replace q10_`i'= q10_`i'/10
 }
 
 
 * Party identification =========================================================
-
-// recode the party identification variable (Q25) to make party codes parallel 
-// with the party choice variable (Q7)
 
 
 // Generate a set of dichotomous variables from the PID variable - - - - - - - -
@@ -154,10 +147,8 @@ forvalues i = 1501/1507 {
 replace q13_`i'=. if q13_`i'>10 
 }
 
-
 // Rescale respondents' positions - - - - - - - - - - - - - - - - - - - - - - -
 replace Q11 = Q11/10
-
 
 // Rescale individual perceptions of party positions - - - - - - - - - - - - - -
 forvalues i = 1501/1507 {
@@ -169,7 +160,7 @@ forvalues i = 1501/1507 {
 egen q13_mean_`i' = mean(q13_`i')	
 }
 
-// Generate mean values of party positions for ches var - - - - - - - - - - - - 
+// Generate variables for party positions for ches var - - - - - - - - - - - - 
 forvalues i = 1501/1507 {
 gen lrgen2_stack_`i' = lrgen if Q7==`i'	
 egen lrgen_stack_`i' = mean(lrgen2_stack_`i')
@@ -297,7 +288,7 @@ drop edu1 edu2 edu3
 genstacks q10_ q13_mean_ q13_dist_ q24_mean_ q24_dist_ ///
 lrgen_stack_ lrgen_dist_ eu_position_stack_ eu_position_dist_ ///
 Q25_stack_ Q26_stack_ /// 
-Q7_ Q7_stack_ ///
+Q7_stack_ ///
 age_dich_yhat_ age_cont_yhat_ ///
 socdem_dich_yhat_ socdem_cont_yhat_, rep 
 
@@ -318,7 +309,7 @@ drop respid2 party2
 
 
 * Voting behavior and Background variables - - - - - - - - - - - - - - - - - - -
-ren Q7_ votech
+ren Q7 votech
 ren Q25 pid
 ren Q26 pid_str
 

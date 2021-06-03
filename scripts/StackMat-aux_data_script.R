@@ -106,7 +106,7 @@ rm(list=ls(pattern='contxt_vars'))
 
 # Save the data frame # =============================================================================
 
-haven::write_dta(data = EES2019_ches, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")))
+haven::write_dta(data = EES2019_ches, path(paste0(getwd(), '/data/' ,"EES_CHES_2019_aux.dta")), version = 13)
 
 rm(list=ls(pattern="CHES|aux"))
 
@@ -140,6 +140,17 @@ EES_Q25 <-
 
 # Save the data frame # =============================================================================
 
-haven::write_dta(data = EES_Q25, path(paste0(getwd(), '/data/' ,"EES_2019_Q25_aux.dta")))
+haven::write_dta(data = EES_Q25, path(paste0(getwd(), '/data/' ,"EES_2019_Q25_aux.dta")), version = 13)
 
 rm(list=ls(pattern="EES"))
+
+
+# Load and created another version of the EES2019 dataset (compatible w/ Stata 13) ==================
+
+
+# EES 2019 voter study dataset # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+EES2019 <- 
+  haven::read_dta(paste0(getwd(), '/data/' ,'ZA7581_v1-0-0.dta')) 
+
+haven::write_dta(data = EES2019, path(paste0(getwd(), '/data/' ,"ZA7581_v1-0-0_stata13.dta")), version = 13)
+

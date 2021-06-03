@@ -439,7 +439,7 @@ EES2019_it_stacked %<>%
                 socdem_cont_yhat = socdem_cont_yhat_,
                 socdem_dich_yhat = socdem_dich_yhat_,
                 pid = Q25,
-  ) %>%
+                ) %>%
   dplyr::select(respid, party, stackid, votech, pid, pid_str, age, gndr, edu,
                 lr_self, lr_party, lr_party_ches, euint_self, euint_party, euint_party_ches, 
                 ptv, stacked_votech, lr_dist, lr_dist_ches, euint_dist, euint_dist_ches, 
